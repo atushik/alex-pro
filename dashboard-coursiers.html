@@ -3,73 +3,273 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
-<title>Espace Coursier - Alex Pro</title>
-<link rel="manifest" href="./manifest-pro.json">
+<title>AlexLivraison Pro</title>
+
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
+<link rel="manifest" href="./manifest-pro.json">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  :root{--primary:#6b23ff;--accent:#00e676;--bg:#f2f2f7;--text:#1d1d1f;--shadow:0 8px 30px rgba(0,0,0,0.12);}
+  :root{
+    --primary:#6b23ff;
+    --accent:#00e676;
+    --bg:#f2f2f7;
+    --text:#1d1d1f;
+    --surface:#ffffff;
+    --shadow:0 8px 30px rgba(0,0,0,0.12);
+  }
   * {box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  body {font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--bg); margin:0; padding:0; color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column;}
+  body {
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:var(--bg); margin:0; padding:0; color:var(--text);
+    height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  }
+  #map-layer {
+    position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;
+  }
   
-  #map-layer {position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;}
+  .leaflet-top { top: 120px; }
+
+  .map-logo {
+      position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+      width: 55px; height: 55px;
+      border-radius: 50%; border: 3px solid #fff; box-shadow: var(--shadow);
+      z-index: 20; object-fit: cover; animation: floatLogo 4s ease-in-out infinite;
+  }
+  @keyframes floatLogo { 0%,100%{transform:translate(-50%, 0);} 50%{transform:translate(-50%, -5px);} }
+
+  .top-bar {
+      position: absolute; top: 0; left: 0; width: 100%; z-index: 10;
+      padding: 15px 15px; display: flex; justify-content: space-between; align-items: flex-start;
+      pointer-events: none;
+  }
   
-  .top-bar {position: absolute; top: 0; left: 0; width: 100%; z-index: 10; padding: 15px; display: flex; justify-content: space-between; pointer-events: none; padding-top: 50px;}
-  
-  .status-pill {pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 8px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s;}
-  .dot {width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent);}
+  .status-pill {
+      pointer-events: auto;
+      background: #fff; padding: 8px 12px; border-radius: 50px;
+      display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85em;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
+  }
+  .status-pill:active { transform: scale(0.95); }
+  .dot {width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent);}
   .dot.off {background: #ff4d4d; box-shadow: 0 0 8px #ff4d4d;}
   
-  .settings-btn {pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; color: #333;}
+  .settings-btn {
+      pointer-events: auto;
+      background: #fff; padding: 8px 12px; border-radius: 50px;
+      display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85em;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
+      color: var(--text);
+  }
+  .settings-btn:active { transform: scale(0.95); }
 
-  .orders-container {position: absolute; bottom: 90px; left: 0; right: 0; z-index: 10; display: flex; gap: 10px; overflow-x: auto; padding: 0 15px; scroll-snap-type: x mandatory; padding-bottom: 10px;}
-  .orders-container::-webkit-scrollbar {display: none;}
+  .orders-carousel {
+      position: absolute; bottom: 85px; left: 0; right: 0; z-index: 10;
+      display: flex; gap: 8px; overflow-x: auto; padding: 0 10px;
+      scroll-snap-type: x mandatory; scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch; padding-bottom: 5px;
+  }
+  .orders-carousel::-webkit-scrollbar {display: none;}
   
-  .order-card {min-width: 260px; background: #fff; border-radius: 16px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); scroll-snap-align: center; display: flex; flex-direction: column; animation: popIn 0.3s ease-out; border-left: 5px solid var(--primary);}
+  .order-card {
+      min-width: 200px; max-width: 220px; background: #fff;
+      border-radius: 12px; 
+      padding: 6px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      scroll-snap-align: center; border-left: 3px solid var(--primary);
+      display: flex; flex-direction: column; justify-content: space-between;
+      animation: popIn 0.3s ease-out;
+  }
   @keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
   
-  .order-header {display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700;}
-  .price-tag {background: #6b23ff; color: #fff; padding: 2px 8px; border-radius: 6px;}
+  .order-head {
+      display: flex; justify-content: space-between; align-items: center; 
+      margin-bottom: 2px;
+  }
+  .shop-name {font-weight: 700; font-size: 0.8em; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;}
+  .order-price {background: #6b23ff; color: #fff; padding: 2px 6px; border-radius: 6px; font-weight: 700; font-size: 0.8em;}
   
-  .order-info {font-size: 0.9em; color: #555; margin-bottom: 10px; display:flex; flex-direction:column; gap:5px;}
-  .btn-accept {width: 100%; padding: 10px; background: linear-gradient(90deg, #6b23ff, #8e5aff); color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;}
-  
-  .empty-state {position: absolute; bottom: 140px; width: 100%; text-align: center; color: #666; font-weight: 600; pointer-events: none;}
-  
-  .nav-bar {position:fixed; bottom:0; left:0; width:100%; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:10px 0; padding-bottom:25px; z-index:50; border-top:1px solid rgba(0,0,0,0.05);}
-  .nav-item {display:flex; flex-direction:column; align-items:center; gap:4px; color:#aaa; font-size:0.75em; font-weight: 700; cursor:pointer; width: 20%;}
-  .nav-item.active {color:var(--primary);}
-  .nav-icon {font-size:1.6em; transition:0.2s;}
-  .nav-item:active .nav-icon {transform:scale(0.9);}
-  .emoji-anim {display: inline-block;}
+  .big-info {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2px; 
+      background: #f0f2f5; border-radius: 8px; 
+      margin-bottom: 2px; 
+      border: 1px solid #fff;
+  }
+  .arrow-down { font-size: 0.9em; color: #ff9800; margin: 0; font-weight: bold; line-height: 1; }
+  .info-tag {
+      background: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.75em; color: #32006b;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #32006b; margin-top: 1px;
+  }
 
-  .full-page {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f2f2f7; z-index: 100; display: none; flex-direction: column; overflow-y: auto;}
-  .page-header {background: #fff; padding: 15px; padding-top: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 101;}
-  .btn-back {width: 40px; height: 40px; border-radius: 50%; border: none; background: #f5f5f5; font-size: 1.5em; display: flex; align-items: center; justify-content: center; color: var(--primary);}
-  .page-title {font-size: 1.3em; font-weight: 800; color: #1c1c1e;}
-  
-  .content-box {padding: 20px;}
-  .menu-list {background: #fff; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);}
-  .menu-item {padding: 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-weight: 600;}
-  .menu-item:last-child {border-bottom: none;}
+  .btn-accept {
+      width: 100%; 
+      padding: 5px; 
+      background: linear-gradient(90deg, #6b23ff, #8e5aff); color: #fff; border: none;
+      border-radius: 8px; font-weight: 700; font-size: 0.85em; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(107,35,255,0.3); transition: 0.2s;
+  }
 
-  .active-order-box {background:#fff; margin:20px; padding:20px; border-radius:20px; box-shadow:var(--shadow);}
-  .step-card {border-left:2px solid #ddd; padding-left:20px; margin-bottom:20px; position:relative;}
-  .step-card.active {border-left-color:var(--primary);}
-  .step-title {font-weight:700; margin-bottom:5px;}
-  .btn-action {width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:10px; color:#fff;}
-  .btn-pickup {background:#ff9800;} 
-  .btn-deliver {background:#00c853;}
+  .btn-accept:active { transform: scale(0.98); }
+
+  .empty-state {
+      position: absolute; bottom: 130px; width: 90%; left: 5%; text-align: center;
+      color: #666; font-weight: 600; background: rgba(255,255,255,0.9);
+      padding: 15px; border-radius: 15px; box-shadow: var(--shadow); backdrop-filter: blur(10px);
+  }
+
+  .full-page {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #f2f2f7; z-index: 100; display: none; flex-direction: column;
+      overflow-y: auto;
+  }
+  .page-content {
+      flex: 1; overflow-y: auto; padding-bottom: 100px;
+  }
+  .page-header {
+      background: #fff; padding: 15px 20px; padding-top: 50px;
+      display: flex; align-items: center; gap: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 101;
+  }
+  .btn-back-page { 
+      width: 40px; height: 40px; border-radius: 50%; border: none; background: #f5f5f5; 
+      font-size: 1.8em; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--primary); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-family: monospace; padding-bottom: 4px;
+  }
+  .btn-back-page:hover, .btn-back-page:active {
+      transform: scale(1.1); background: #e0e0e0;
+      animation: backPulse 0.6s infinite;
+  }
+  @keyframes backPulse { 0% { transform: translateX(0) scale(1.1); } 50% { transform: translateX(-3px) scale(1.1); } 100% { transform: translateX(0) scale(1.1); } }
+
+  .page-title { font-size: 1.3em; font-weight: 800; flex: 1; color: #1c1c1e; }
+
+  .settings-content { padding: 25px; }
+  .range-box { 
+      background: #fff; padding: 25px; border-radius: 24px; text-align: center; margin-top: 20px; 
+      box-shadow: var(--shadow);
+  }
+  .map-preview-box {
+      height: 180px; background: #eee; border-radius: 16px; margin-bottom: 20px;
+      overflow: hidden; position: relative; border: 2px solid #fff; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+  }
+  .slider-container { position: relative; width: 100%; padding: 10px 0; }
+  input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; }
+  input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; 
+      background: #ffffff; border: 4px solid #007bff; cursor: pointer; margin-top: -12px; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 6px; cursor: pointer; background: #007bff; border-radius: 3px;
+  }
+  .range-val { font-size: 1.2em; font-weight: 800; color: #007bff; margin-top: 10px; display: block; }
+
+  .profile-header {
+      background: #fff; padding: 40px 20px; text-align: center; margin-bottom: 20px;
+      border-radius: 0 0 30px 30px; box-shadow: var(--shadow);
+  }
+  .profile-pic {
+      width: 100px; height: 100px; border-radius: 50%; background: #f0f2f5; margin: 0 auto 15px;
+      display: flex; align-items: center; justify-content: center; font-size: 3em;
+      border: 4px solid var(--primary); overflow: hidden; position: relative;
+      box-shadow: 0 10px 20px rgba(107,35,255,0.2); cursor: pointer;
+  }
+  .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+  .upload-overlay {
+      position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: #fff; 
+      font-size: 10px; padding: 3px 0; font-weight: bold;
+  }
+  
+  .menu-list { background: #fff; border-radius: 20px; margin: 0 20px 20px 20px; overflow: hidden; box-shadow: var(--shadow); }
+  .menu-item {
+      padding: 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer; font-weight: 600; font-size: 1em; color: #333;
+      transition: 0.2s;
+  }
+  .menu-item:active { background: #f9f9f9; }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-arrow { width: 24px; height: 24px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }
+
+  .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+  .doc-card {
+      background: #fff; padding: 15px; border-radius: 16px; text-align: center;
+      box-shadow: var(--shadow); aspect-ratio: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 8px; transition: 0.2s;
+  }
+  .doc-card:active { transform: scale(0.98); }
+  .doc-icon { font-size: 2.2em; }
+  .doc-label { font-size: 0.8em; font-weight: 700; color: #555; }
+  .doc-status { font-size: 0.7em; font-weight: 800; color: #00c853; background: #e8f5e9; padding: 2px 8px; border-radius: 4px; }
+
+  .nav-bar {
+    position:fixed; bottom:0; left:0; width:100%; background:rgba(255,255,255,0.98);
+    backdrop-filter:blur(20px); border-top:1px solid rgba(0,0,0,0.05);
+    display:flex; justify-content:space-around; padding:12px 0; padding-bottom:30px; z-index:50;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+  }
+  .nav-item {
+    display:flex; flex-direction:column; align-items:center; gap:5px; color:#aaa; font-size:0.75em; font-weight: 700; cursor:pointer; width: 20%; transition: 0.3s;
+  }
+  .nav-item.active { color:var(--primary); transform: translateY(-4px); }
+  .nav-icon { font-size:1.7em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+
+  .emoji-anim { display: inline-block; animation: stickerFloat 3s ease-in-out infinite; }
+  @keyframes stickerFloat {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+
+  @keyframes bikeRide {
+    0% { transform: translate(-10px, -10px) rotate(0deg); }
+    25% { transform: translate(-10px, -12px) rotate(-2deg); }
+    50% { transform: translate(-10px, -10px) rotate(0deg); }
+    75% { transform: translate(-10px, -12px) rotate(2deg); }
+    100% { transform: translate(-10px, -10px) rotate(0deg); }
+  }
+  .marker-c div { animation: bikeRide 1s infinite linear; }
+
+  .btn-save {
+      width: 100%; padding: 16px; background: #007bff; color: #fff; border: none;
+      border-radius: 50px; font-weight: 800; font-size: 1.1em; margin-top: 20px; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+  }
+
+  .active-order-box {
+      background: #fff; margin: 20px; padding: 20px; border-radius: 20px; box-shadow: var(--shadow);
+  }
+  .step-card {
+      border-left: 2px solid #ddd; padding-left: 20px; margin-bottom: 20px; position: relative;
+  }
+  .step-card::before {
+      content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #ccc;
+  }
+  .step-card.active { border-left-color: var(--primary); }
+  .step-card.active::before { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+  .step-title { font-weight: 700; font-size: 1.1em; margin-bottom: 5px; }
+  .step-addr { font-size: 0.9em; color: #666; }
+  
+  .btn-action {
+      width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; font-size: 1em; cursor: pointer;
+      margin-top: 10px; transition: 0.2s;
+  }
+  .btn-pickup { background: #ff9800; color: #fff; box-shadow: 0 4px 15px rgba(255,152,0,0.3); }
+  .btn-deliver { background: #00c853; color: #fff; box-shadow: 0 4px 15px rgba(0,200,83,0.3); }
+
 </style>
 </head>
 <body>
 
 <div id="map-layer"></div>
+<img src="logo-pro.jpg" class="map-logo">
 
 <div class="top-bar">
     <div class="status-pill" onclick="toggleStatus()">
@@ -78,12 +278,15 @@
     </div>
     <div class="settings-btn" onclick="openPage('settings')">
         <span class="emoji-anim">⚙️</span>
+        <span>Réglages</span>
     </div>
 </div>
 
-<div id="orders-container" class="orders-container"></div>
-<div id="empty-msg" class="empty-state">
-    <span style="font-size:2em">📡</span><br>Recherche de courses...
+<div id="orders-container" class="orders-carousel">
+    <div class="empty-state">
+        <span class="emoji-anim" style="font-size:2em">📡</span><br>
+        Recherche de courses...
+    </div>
 </div>
 
 <div class="nav-bar">
@@ -95,7 +298,7 @@
     <div class="nav-icon"><span class="emoji-anim">🎒</span></div>
     <div>En cours</div>
   </div>
-  <div class="nav-item" onclick="openPage('gains')">
+  <div class="nav-item" onclick="openPage('wallet')">
     <div class="nav-icon"><span class="emoji-anim">💰</span></div>
     <div>Gains</div>
   </div>
@@ -103,61 +306,168 @@
     <div class="nav-icon"><span class="emoji-anim">💬</span></div>
     <div>Aide</div>
   </div>
-  <div class="nav-item" onclick="openPage('compte')">
+  <div class="nav-item" onclick="openPage('profile')">
     <div class="nav-icon"><span class="emoji-anim">👤</span></div>
     <div>Compte</div>
   </div>
 </div>
 
-<div id="page-encours" class="full-page">
-    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Livraison en cours</div></div>
-    <div class="content-box" id="activeOrderContent">
-        <div style="text-align:center;color:#888;margin-top:50px">Aucune course active</div>
+<div id="page-settings" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Réglages</div>
+    </div>
+    <div class="page-content">
+        <div class="menu-list">
+             <div class="menu-item" onclick="openRadiusSettings()">
+                <span><span class="emoji-anim">🗺️</span> Distance de course</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+            <div class="menu-item">
+                <span><span class="emoji-anim">🔔</span> Notifications</span>
+                <input type="checkbox" checked>
+            </div>
+        </div>
+        
+        <div id="radius-box" class="range-box" style="display:none">
+             <div class="map-preview-box" id="settingMap"></div>
+             <div class="slider-container">
+                 <input type="range" min="1" max="50" value="15" oninput="updateRadius(this.value)">
+             </div>
+             <span class="range-val"><span id="distVal">15</span> km</span>
+             <button class="btn-save" onclick="document.getElementById('radius-box').style.display='none'">Valider</button>
+        </div>
     </div>
 </div>
 
-<div id="page-gains" class="full-page">
-    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Mes Gains</div></div>
-    <div class="content-box">
-        <div style="background:linear-gradient(45deg,#ff6b6b,#ee5253);padding:30px;border-radius:20px;color:#fff;text-align:center;box-shadow:0 10px 30px rgba(238,82,83,0.3)">
-            <div style="opacity:0.9">Solde disponible</div>
-            <div style="font-size:2.5em;font-weight:900;margin:10px 0" id="walletAmount">0,00 €</div>
+<div id="page-profile" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Mon Compte</div>
+    </div>
+    <div class="page-content">
+        <div class="profile-header">
+            <div class="profile-pic" onclick="document.getElementById('avatarInput').click()">
+                <span id="avatarEmoji" class="emoji-anim">📸</span>
+                <img id="avatarImg" src="" style="display:none">
+                <div class="upload-overlay">Modifier</div>
+            </div>
+            <input type="file" id="avatarInput" hidden accept="image/*" onchange="previewAvatar(this)">
+            <h2 style="margin:0;color:#333" id="profileName">Chargement...</h2>
+            <p style="color:#888;margin:5px 0;font-weight:500">Coursier Certifié</p>
         </div>
-        <div style="margin-top:20px;text-align:center;color:#999">Historique vide</div>
+
+        <div class="menu-list">
+            <div class="menu-item" onclick="openPage('documents')">
+                <span><span class="emoji-anim">📂</span> Mes documents</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+            <div class="menu-item" onclick="openPage('transport')">
+                <span><span class="emoji-anim">🛵</span> Mon véhicule</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+            <div class="menu-item" style="color:red" onclick="logout()">
+                <span><span class="emoji-anim">🔴</span> Déconnexion</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="page-transport" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="openPage('profile')">‹</button>
+        <div class="page-title">Mon Véhicule</div>
+    </div>
+    <div class="page-content">
+        <div class="menu-list" id="vehicleList">
+             </div>
+    </div>
+</div>
+
+<div id="page-documents" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="openPage('profile')">‹</button>
+        <div class="page-title">Mes Documents</div>
+    </div>
+    <div class="page-content">
+        <div class="doc-grid">
+            <div class="doc-card" onclick="alert('Modifier CNI ?')">
+                <div class="doc-icon emoji-anim">🆔</div>
+                <div class="doc-label">Identité</div>
+                <span class="doc-status">Validé</span>
+            </div>
+            <div class="doc-card" onclick="alert('Ajouter RIB ?')">
+                <div class="doc-icon emoji-anim">🏦</div>
+                <div class="doc-label">RIB / IBAN</div>
+                <span class="doc-status" style="background:#fff3e0;color:#e65100">Modifier</span>
+            </div>
+            <div class="doc-card">
+                <div class="doc-icon emoji-anim">📄</div>
+                <div class="doc-label">Contrat</div>
+                <span class="doc-status">Signé</span>
+            </div>
+            <div class="doc-card" onclick="alert('Changer Kbis ?')">
+                <div class="doc-icon emoji-anim">💼</div>
+                <div class="doc-label">Kbis / Auto-ent</div>
+                <span class="doc-status" style="background:#fee2e2;color:#d32f2f">Expiré</span>
+            </div>
+        </div>
+        <button class="btn-save" style="width:90%;margin:5% 5%" onclick="alert('Ajouter un document')">➕ Ajouter un document</button>
     </div>
 </div>
 
 <div id="page-aide" class="full-page">
-    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Aide</div></div>
-    <div class="content-box">
-        <div class="menu-list">
-            <div class="menu-item" onclick="location.href='https://wa.me/33600000000'"><span>💬 Support WhatsApp</span><span>❯</span></div>
-            <div class="menu-item" onclick="location.href='tel:+33600000000'"><span>📞 Appeler le support</span><span>❯</span></div>
+    <div class="page-header">
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Centre d'aide</div>
+    </div>
+    <div class="page-content">
+        <div class="menu-list" style="margin-top:20px">
+            <div class="menu-item" onclick="location.href='https://wa.me/33677171188'">
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">💬</span> Support WhatsApp</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+            <div class="menu-item" onclick="location.href='tel:+33677171188'">
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">📞</span> Appeler l'assistance</span>
+                <span class="menu-arrow">❯</span>
+            </div>
+            <div class="menu-item">
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">❓</span> FAQ (Questions)</span>
+                <span class="menu-arrow">❯</span>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="page-compte" class="full-page">
-    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Mon Compte</div></div>
-    <div class="content-box">
-        <div style="text-align:center;margin-bottom:20px">
-            <div style="width:80px;height:80px;background:#ddd;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:2em">👤</div>
-            <h3 id="profileName">Chargement...</h3>
-        </div>
-        <div class="menu-list">
-            <div class="menu-item"><span>📄 Mes documents</span><span>❯</span></div>
-            <div class="menu-item"><span>🛵 Mon véhicule</span><span>❯</span></div>
-            <div class="menu-item" style="color:red" onclick="logout()"><span>🔴 Déconnexion</span><span>❯</span></div>
+<div id="page-wallet" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Ma Cagnotte</div>
+    </div>
+    <div class="page-content">
+        <div style="padding:20px">
+            <div style="background:linear-gradient(45deg,#ff6b6b,#ee5253);padding:30px;border-radius:20px;color:#fff;text-align:center;box-shadow:0 10px 30px rgba(238,82,83,0.3)">
+                <div style="opacity:0.8;font-weight:600">Solde disponible</div>
+                <div style="font-size:2.5em;font-weight:900;margin:10px 0" id="walletAmount">0,00 €</div>
+            </div>
+            <button class="btn-save" style="background:#333;color:#fff;margin-top:15px">🏦 Retirer mes fonds</button>
+            <h3 style="margin-top:30px;color:#32006b">Historique</h3>
+            <div id="tx-history" style="text-align:center;color:#999;margin-top:20px;font-style:italic">Aucune transaction</div>
         </div>
     </div>
 </div>
 
-<div id="page-settings" class="full-page">
-    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Réglages</div></div>
-    <div class="content-box">
-        <div class="menu-list">
-            <div class="menu-item"><span>🔔 Notifications</span><input type="checkbox" checked></div>
-            <div class="menu-item"><span>🗺️ Type de carte</span><span>❯</span></div>
+<div id="page-encours" class="full-page">
+    <div class="page-header">
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Livraison en cours</div>
+    </div>
+    <div class="page-content" id="activeOrderContent">
+        <div style="padding:40px;text-align:center">
+            <span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">🤷‍♂️</span>
+            <h3 style="color:#333">Aucune livraison en cours</h3>
+            <p style="color:#666">Activez le mode "En ligne" pour recevoir des commandes.</p>
         </div>
     </div>
 </div>
@@ -169,152 +479,179 @@ const db=firebase.firestore();
 
 if(!localStorage.getItem('alex_courier_logged')) window.location.href='index.html';
 
-let map, marker, isOnline = true, currentOrderId = null;
-const courierLat = 43.1242, courierLon = 5.928;
+let map, isOnline = true, settingMap;
+let courierLat = 43.1242, courierLon = 5.928;
+let deliveryRadius = 15;
+let currentOrderId = null;
+
+const VEHICLES = [
+    "À pied 🚶", "Trottinette 🛴", "Vélo 🚲", "Vélo Électrique ⚡🚲",
+    "Scooter 🛵", "Scooter Électrique ⚡🛵", "Voiture 🚗", "Voiture Électrique ⚡🚗",
+    "Camionnette 🚐", "Camionnette Élec. ⚡🚐", "Camion 🚛", "Camion Électrique ⚡🚛"
+];
 
 function initMap() {
-    map = L.map('map-layer', {zoomControl: false, attributionControl: false}).setView([courierLat, courierLon], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
-    const icon = L.divIcon({html: '<div style="font-size:24px;transform:translate(-12px,-12px)">🚴</div>', className: ''});
-    marker = L.marker([courierLat, courierLon], {icon: icon}).addTo(map);
-    
-    if(navigator.geolocation) {
-        navigator.geolocation.watchPosition(pos => {
-            const lat = pos.coords.latitude, lon = pos.coords.longitude;
-            marker.setLatLng([lat, lon]);
-            if(!currentOrderId) map.setView([lat, lon], 13);
-            db.collection('couriers').doc(localStorage.getItem('alex_courier_id')).update({lat, lng: lon, lastSeen: new Date()});
-        }, null, {enableHighAccuracy:true});
-    }
+  map = L.map('map-layer', {zoomControl: false, attributionControl: false}).setView([courierLat, courierLon], 13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+  const icon = L.divIcon({html: '<div style="font-size:24px;transform:translate(-10px,-10px)">🚴</div>', className: 'marker-c'});
+  L.marker([courierLat, courierLon], {icon: icon}).addTo(map);
+  
+  if(navigator.geolocation) {
+      navigator.geolocation.watchPosition(pos => {
+          courierLat = pos.coords.latitude; courierLon = pos.coords.longitude;
+          if(!currentOrderId) map.setView([courierLat, courierLon], 13);
+      });
+  }
+  loadOrders();
+  loadVehicleList();
+  
+  const savedAvatar = localStorage.getItem('alex_avatar');
+  if(savedAvatar) {
+      document.getElementById('avatarImg').src = savedAvatar;
+      document.getElementById('avatarImg').style.display = 'block';
+      document.getElementById('avatarEmoji').style.display = 'none';
+  }
+  document.getElementById('profileName').innerText = localStorage.getItem('alex_courier_name') || 'Livreur';
 }
 
-function loadOrders() {
-    db.collection('orders').where('status', '==', 'pending').onSnapshot(snap => {
-        const container = document.getElementById('orders-container');
-        container.innerHTML = '';
-        const empty = document.getElementById('empty-msg');
-        
-        if(snap.empty || !isOnline || currentOrderId) {
-            empty.style.display = 'block';
-            empty.innerHTML = currentOrderId ? '' : (isOnline ? '<span style="font-size:2em">📡</span><br>Recherche de courses...' : 'Vous êtes hors ligne');
-            return;
-        }
-        empty.style.display = 'none';
-        
-        snap.forEach(doc => {
-            const o = doc.data();
-            const div = document.createElement('div');
-            div.className = 'order-card';
-            div.innerHTML = `
-                <div class="order-header">
-                    <span>${o.shopName || 'Restaurant'}</span>
-                    <span class="price-tag">${o.price} €</span>
-                </div>
-                <div class="order-info">
-                    <span>📍 ${o.from}</span>
-                    <span>🏁 ${o.to}</span>
-                </div>
-                <button class="btn-accept" onclick="acceptOrder('${doc.id}')">ACCEPTER</button>
-            `;
-            container.appendChild(div);
-        });
+function loadVehicleList(){
+    const list = document.getElementById('vehicleList');
+    VEHICLES.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        div.innerHTML = `<span>${v}</span><span class="menu-arrow">⚪</span>`;
+        div.onclick = () => {
+             document.querySelectorAll('#vehicleList .menu-arrow').forEach(e=>e.innerText='⚪');
+             div.querySelector('.menu-arrow').innerText='✅';
+             alert('Véhicule sélectionné: '+v);
+        };
+        list.appendChild(div);
     });
-}
-
-async function acceptOrder(id) {
-    try {
-        await db.collection('orders').doc(id).update({
-            status: 'accepted',
-            courierId: localStorage.getItem('alex_courier_id'),
-            acceptedAt: new Date()
-        });
-        currentOrderId = id;
-        checkActiveOrder();
-        openPage('encours');
-    } catch(e) { alert("Erreur: " + e.message); }
-}
-
-function checkActiveOrder() {
-    const uid = localStorage.getItem('alex_courier_id');
-    db.collection('orders').where('courierId', '==', uid).where('status', 'in', ['accepted', 'picked_up']).onSnapshot(snap => {
-        if(!snap.empty) {
-            const doc = snap.docs[0];
-            currentOrderId = doc.id;
-            renderActive(doc.id, doc.data());
-        } else {
-            currentOrderId = null;
-            document.getElementById('activeOrderContent').innerHTML = '<div style="text-align:center;color:#888;margin-top:50px">Aucune course active</div>';
-        }
-    });
-}
-
-function renderActive(id, data) {
-    const isPicked = data.status === 'picked_up';
-    document.getElementById('activeOrderContent').innerHTML = `
-        <div class="active-order-box">
-            <h2>Course en cours</h2>
-            <div class="step-card ${!isPicked?'active':''}">
-                <div class="step-title">📍 ${data.from}</div>
-                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="updateStatus('${id}','picked_up')">📦 Colis Récupéré</button>` : ''}
-            </div>
-            <div class="step-card ${isPicked?'active':''}">
-                <div class="step-title">🏁 ${data.to}</div>
-                <div style="color:#666;margin-bottom:10px">📞 ${data.clientPhone || 'Client'}</div>
-                ${isPicked ? `<button class="btn-action btn-deliver" onclick="updateStatus('${id}','delivered')">✅ Livré</button>` : ''}
-            </div>
-        </div>
-    `;
-}
-
-async function updateStatus(id, st) {
-    if(st === 'delivered') {
-        const gain = 5.00; 
-        const w = parseFloat(localStorage.getItem('alex_wallet')||0) + gain;
-        localStorage.setItem('alex_wallet', w.toFixed(2));
-        document.getElementById('walletAmount').innerText = w.toFixed(2) + " €";
-        alert(`Livré ! +${gain}€`);
-    }
-    await db.collection('orders').doc(id).update({status: st});
 }
 
 function toggleStatus() {
     isOnline = !isOnline;
     const dot = document.getElementById('statusDot');
     const txt = document.getElementById('statusText');
-    if(isOnline) {
-        dot.classList.remove('off'); txt.innerText = "En ligne";
+    if (isOnline) {
+        dot.classList.remove('off'); txt.innerText = "En ligne"; 
         loadOrders();
     } else {
         dot.classList.add('off'); txt.innerText = "Hors ligne";
-        document.getElementById('orders-container').innerHTML = '';
-        document.getElementById('empty-msg').innerText = "Vous êtes hors ligne";
+        document.getElementById('orders-container').innerHTML = '<div class="empty-state">Vous êtes hors ligne</div>';
     }
+}
+
+function loadOrders() {
+    if(!isOnline) return;
+    db.collection('orders').where('status', '==', 'pending').onSnapshot(snap => {
+        const container = document.getElementById('orders-container');
+        container.innerHTML = '';
+        if(snap.empty) {
+            container.innerHTML = '<div class="empty-state"><span class="emoji-anim">📡</span><br>Recherche de courses...</div>';
+            return;
+        }
+        snap.forEach(doc => {
+            const o = doc.data();
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <div class="order-head">
+                    <div class="shop-name"><span class="emoji-anim">🏪</span> ${o.shopName||'Resto'}</div>
+                    <div class="order-price">${o.price} €</div>
+                </div>
+                <div class="big-info">
+                    <div class="info-tag">📍 ${o.from}</div>
+                    <div class="arrow-down">⬇</div>
+                    <div class="info-tag">🏁 ${o.to}</div>
+                </div>
+                <button class="btn-accept" onclick="acceptOrder('${doc.id}')">ACCEPTER</button>
+            `;
+            container.appendChild(card);
+        });
+    });
 }
 
 function openPage(id) {
     document.querySelectorAll('.full-page').forEach(p => p.style.display = 'none');
-    const p = document.getElementById('page-'+id);
-    if(p) p.style.display = 'flex';
+    document.getElementById('page-' + id).style.display = 'flex';
 }
-
 function closeAllPages() {
     document.querySelectorAll('.full-page').forEach(p => p.style.display = 'none');
 }
 
+function openRadiusSettings(){
+    const box = document.getElementById('radius-box');
+    box.style.display = 'block';
+    if(!settingMap) {
+        setTimeout(() => {
+            settingMap = L.map('settingMap', {zoomControl:false}).setView([courierLat, courierLon], 10);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(settingMap);
+            L.circle([courierLat, courierLon], {color: '#007bff', radius: deliveryRadius * 1000}).addTo(settingMap);
+        }, 200);
+    }
+}
+function updateRadius(val) {
+    deliveryRadius = val;
+    document.getElementById('distVal').innerText = val;
+}
+
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatarImg').src = e.target.result;
+            document.getElementById('avatarImg').style.display = 'block';
+            document.getElementById('avatarEmoji').style.display = 'none';
+            localStorage.setItem('alex_avatar', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function acceptOrder(id) {
+    await db.collection('orders').doc(id).update({status: 'accepted', courierId: localStorage.getItem('alex_courier_id')});
+    currentOrderId = id;
+    renderActiveOrder(id);
+    openPage('encours');
+}
+
+function renderActiveOrder(id){
+    document.getElementById('activeOrderContent').innerHTML = `
+        <div class="active-order-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+                <h2 style="margin:0">En Cours</h2>
+                <span class="emoji-anim" style="font-size:2em">🛵</span>
+            </div>
+            <div class="step-card active">
+                <div class="step-title"><span class="emoji-anim">📍</span> Restaurant</div>
+                <div class="step-addr">Adresse de récupération</div>
+                <button class="btn-action btn-pickup">📦 Colis Récupéré</button>
+            </div>
+            <div class="step-card">
+                <div class="step-title"><span class="emoji-anim">🏁</span> Client</div>
+                <div class="step-addr">Adresse de livraison</div>
+                <button class="btn-action btn-deliver" onclick="finishOrder('${id}')">✅ Livré</button>
+            </div>
+        </div>
+    `;
+}
+
+function finishOrder(id){
+    db.collection('orders').doc(id).update({status:'delivered'});
+    currentOrderId = null;
+    alert("Bravo ! Course terminée.");
+    closeAllPages();
+}
+
 function logout() {
-    if(confirm("Se déconnecter ?")) {
+    if(confirm("Déconnexion ?")) {
         localStorage.removeItem('alex_courier_logged');
         window.location.href = 'index.html';
     }
 }
 
-window.onload = () => {
-    initMap();
-    loadOrders();
-    checkActiveOrder();
-    document.getElementById('profileName').innerText = localStorage.getItem('alex_courier_name') || 'Livreur';
-    document.getElementById('walletAmount').innerText = (localStorage.getItem('alex_wallet')||'0.00') + " €";
-};
+window.onload = initMap;
 </script>
 </body>
 </html> 
