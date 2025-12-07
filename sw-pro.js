@@ -1,11 +1,11 @@
-const CACHE_NAME = 'alex-pro-repair-v1';
+const CACHE_NAME = 'alex-pro-v-final-fix';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json?v=fix',
-  './logo-pro.jpg?v=fix'
+  './manifest-pro.json',
+  './logo-pro.jpg'
 ];
 
 self.addEventListener('install', event => {
