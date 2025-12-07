@@ -8,13 +8,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "logo-pro.jpg",
+      "src": "logo-pro.jpg?v=999",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "logo-pro.jpg",
+      "src": "logo-pro.jpg?v=999",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any"
