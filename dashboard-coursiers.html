@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>Espace Coursier - Alex Pro</title>
+<link rel="manifest" href="./manifest-pro.json">
+<meta name="theme-color" content="#6b23ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="logo-pro.jpg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{--primary:#6b23ff;--accent:#00e676;--bg:#f2f2f7;--text:#1d1d1f;--shadow:0 8px 30px rgba(0,0,0,0.12);}
+  * {box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body {font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--bg); margin:0; padding:0; color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column;}
+  
+  #map-layer {position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;}
+  
+  .top-bar {position: absolute; top: 0; left: 0; width: 100%; z-index: 10; padding: 15px; display: flex; justify-content: space-between; pointer-events: none; padding-top: 50px;}
+  
+  .status-pill {pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 8px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s;}
+  .dot {width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent);}
+  .dot.off {background: #ff4d4d; box-shadow: 0 0 8px #ff4d4d;}
+  
+  .settings-btn {pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 6px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; color: #333;}
+
+  .orders-container {position: absolute; bottom: 90px; left: 0; right: 0; z-index: 10; display: flex; gap: 10px; overflow-x: auto; padding: 0 15px; scroll-snap-type: x mandatory; padding-bottom: 10px;}
+  .orders-container::-webkit-scrollbar {display: none;}
+  
+  .order-card {min-width: 260px; background: #fff; border-radius: 16px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); scroll-snap-align: center; display: flex; flex-direction: column; animation: popIn 0.3s ease-out; border-left: 5px solid var(--primary);}
+  @keyframes popIn { from{transform:scale(0.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+  
+  .order-header {display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700;}
+  .price-tag {background: #6b23ff; color: #fff; padding: 2px 8px; border-radius: 6px;}
+  
+  .order-info {font-size: 0.9em; color: #555; margin-bottom: 10px; display:flex; flex-direction:column; gap:5px;}
+  .btn-accept {width: 100%; padding: 10px; background: linear-gradient(90deg, #6b23ff, #8e5aff); color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;}
+  
+  .empty-state {position: absolute; bottom: 140px; width: 100%; text-align: center; color: #666; font-weight: 600; pointer-events: none;}
+  
+  .nav-bar {position:fixed; bottom:0; left:0; width:100%; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:10px 0; padding-bottom:25px; z-index:50; border-top:1px solid rgba(0,0,0,0.05);}
+  .nav-item {display:flex; flex-direction:column; align-items:center; gap:4px; color:#aaa; font-size:0.75em; font-weight: 700; cursor:pointer; width: 20%;}
+  .nav-item.active {color:var(--primary);}
+  .nav-icon {font-size:1.6em; transition:0.2s;}
+  .nav-item:active .nav-icon {transform:scale(0.9);}
+  .emoji-anim {display: inline-block;}
+
+  .full-page {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f2f2f7; z-index: 100; display: none; flex-direction: column; overflow-y: auto;}
+  .page-header {background: #fff; padding: 15px; padding-top: 50px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 101;}
+  .btn-back {width: 40px; height: 40px; border-radius: 50%; border: none; background: #f5f5f5; font-size: 1.5em; display: flex; align-items: center; justify-content: center; color: var(--primary);}
+  .page-title {font-size: 1.3em; font-weight: 800; color: #1c1c1e;}
+  
+  .content-box {padding: 20px;}
+  .menu-list {background: #fff; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);}
+  .menu-item {padding: 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-weight: 600;}
+  .menu-item:last-child {border-bottom: none;}
+
+  .active-order-box {background:#fff; margin:20px; padding:20px; border-radius:20px; box-shadow:var(--shadow);}
+  .step-card {border-left:2px solid #ddd; padding-left:20px; margin-bottom:20px; position:relative;}
+  .step-card.active {border-left-color:var(--primary);}
+  .step-title {font-weight:700; margin-bottom:5px;}
+  .btn-action {width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:10px; color:#fff;}
+  .btn-pickup {background:#ff9800;} 
+  .btn-deliver {background:#00c853;}
+</style>
+</head>
+<body>
+
+<div id="map-layer"></div>
+
+<div class="top-bar">
+    <div class="status-pill" onclick="toggleStatus()">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText">En ligne</span>
+    </div>
+    <div class="settings-btn" onclick="openPage('settings')">
+        <span class="emoji-anim">⚙️</span>
+    </div>
+</div>
+
+<div id="orders-container" class="orders-container"></div>
+<div id="empty-msg" class="empty-state">
+    <span style="font-size:2em">📡</span><br>Recherche de courses...
+</div>
+
+<div class="nav-bar">
+  <div class="nav-item active" onclick="closeAllPages()">
+    <div class="nav-icon"><span class="emoji-anim">⚡</span></div>
+    <div>Accueil</div>
+  </div>
+  <div class="nav-item" onclick="openPage('encours')">
+    <div class="nav-icon"><span class="emoji-anim">🎒</span></div>
+    <div>En cours</div>
+  </div>
+  <div class="nav-item" onclick="openPage('gains')">
+    <div class="nav-icon"><span class="emoji-anim">💰</span></div>
+    <div>Gains</div>
+  </div>
+  <div class="nav-item" onclick="openPage('aide')">
+    <div class="nav-icon"><span class="emoji-anim">💬</span></div>
+    <div>Aide</div>
+  </div>
+  <div class="nav-item" onclick="openPage('compte')">
+    <div class="nav-icon"><span class="emoji-anim">👤</span></div>
+    <div>Compte</div>
+  </div>
+</div>
+
+<div id="page-encours" class="full-page">
+    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Livraison en cours</div></div>
+    <div class="content-box" id="activeOrderContent">
+        <div style="text-align:center;color:#888;margin-top:50px">Aucune course active</div>
+    </div>
+</div>
+
+<div id="page-gains" class="full-page">
+    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Mes Gains</div></div>
+    <div class="content-box">
+        <div style="background:linear-gradient(45deg,#ff6b6b,#ee5253);padding:30px;border-radius:20px;color:#fff;text-align:center;box-shadow:0 10px 30px rgba(238,82,83,0.3)">
+            <div style="opacity:0.9">Solde disponible</div>
+            <div style="font-size:2.5em;font-weight:900;margin:10px 0" id="walletAmount">0,00 €</div>
+        </div>
+        <div style="margin-top:20px;text-align:center;color:#999">Historique vide</div>
+    </div>
+</div>
+
+<div id="page-aide" class="full-page">
+    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Aide</div></div>
+    <div class="content-box">
+        <div class="menu-list">
+            <div class="menu-item" onclick="location.href='https://wa.me/33600000000'"><span>💬 Support WhatsApp</span><span>❯</span></div>
+            <div class="menu-item" onclick="location.href='tel:+33600000000'"><span>📞 Appeler le support</span><span>❯</span></div>
+        </div>
+    </div>
+</div>
+
+<div id="page-compte" class="full-page">
+    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Mon Compte</div></div>
+    <div class="content-box">
+        <div style="text-align:center;margin-bottom:20px">
+            <div style="width:80px;height:80px;background:#ddd;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:2em">👤</div>
+            <h3 id="profileName">Chargement...</h3>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item"><span>📄 Mes documents</span><span>❯</span></div>
+            <div class="menu-item"><span>🛵 Mon véhicule</span><span>❯</span></div>
+            <div class="menu-item" style="color:red" onclick="logout()"><span>🔴 Déconnexion</span><span>❯</span></div>
+        </div>
+    </div>
+</div>
+
+<div id="page-settings" class="full-page">
+    <div class="page-header"><button class="btn-back" onclick="closeAllPages()">‹</button><div class="page-title">Réglages</div></div>
+    <div class="content-box">
+        <div class="menu-list">
+            <div class="menu-item"><span>🔔 Notifications</span><input type="checkbox" checked></div>
+            <div class="menu-item"><span>🗺️ Type de carte</span><span>❯</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomain:"alex-livraison.firebaseapp.com",projectId:"alex-livraison",storageBucket:"alex-livraison.firebasestorage.app",messagingSenderId:"937475497279",appId:"1:937475497279:web:62dc9eba8e77a5113ec78a"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+if(!localStorage.getItem('alex_courier_logged')) window.location.href='index.html';
+
+let map, marker, isOnline = true, currentOrderId = null;
+const courierLat = 43.1242, courierLon = 5.928;
+
+function initMap() {
+    map = L.map('map-layer', {zoomControl: false, attributionControl: false}).setView([courierLat, courierLon], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+    const icon = L.divIcon({html: '<div style="font-size:24px;transform:translate(-12px,-12px)">🚴</div>', className: ''});
+    marker = L.marker([courierLat, courierLon], {icon: icon}).addTo(map);
+    
+    if(navigator.geolocation) {
+        navigator.geolocation.watchPosition(pos => {
+            const lat = pos.coords.latitude, lon = pos.coords.longitude;
+            marker.setLatLng([lat, lon]);
+            if(!currentOrderId) map.setView([lat, lon], 13);
+            db.collection('couriers').doc(localStorage.getItem('alex_courier_id')).update({lat, lng: lon, lastSeen: new Date()});
+        }, null, {enableHighAccuracy:true});
+    }
+}
+
+function loadOrders() {
+    db.collection('orders').where('status', '==', 'pending').onSnapshot(snap => {
+        const container = document.getElementById('orders-container');
+        container.innerHTML = '';
+        const empty = document.getElementById('empty-msg');
+        
+        if(snap.empty || !isOnline || currentOrderId) {
+            empty.style.display = 'block';
+            empty.innerHTML = currentOrderId ? '' : (isOnline ? '<span style="font-size:2em">📡</span><br>Recherche de courses...' : 'Vous êtes hors ligne');
+            return;
+        }
+        empty.style.display = 'none';
+        
+        snap.forEach(doc => {
+            const o = doc.data();
+            const div = document.createElement('div');
+            div.className = 'order-card';
+            div.innerHTML = `
+                <div class="order-header">
+                    <span>${o.shopName || 'Restaurant'}</span>
+                    <span class="price-tag">${o.price} €</span>
+                </div>
+                <div class="order-info">
+                    <span>📍 ${o.from}</span>
+                    <span>🏁 ${o.to}</span>
+                </div>
+                <button class="btn-accept" onclick="acceptOrder('${doc.id}')">ACCEPTER</button>
+            `;
+            container.appendChild(div);
+        });
+    });
+}
+
+async function acceptOrder(id) {
+    try {
+        await db.collection('orders').doc(id).update({
+            status: 'accepted',
+            courierId: localStorage.getItem('alex_courier_id'),
+            acceptedAt: new Date()
+        });
+        currentOrderId = id;
+        checkActiveOrder();
+        openPage('encours');
+    } catch(e) { alert("Erreur: " + e.message); }
+}
+
+function checkActiveOrder() {
+    const uid = localStorage.getItem('alex_courier_id');
+    db.collection('orders').where('courierId', '==', uid).where('status', 'in', ['accepted', 'picked_up']).onSnapshot(snap => {
+        if(!snap.empty) {
+            const doc = snap.docs[0];
+            currentOrderId = doc.id;
+            renderActive(doc.id, doc.data());
+        } else {
+            currentOrderId = null;
+            document.getElementById('activeOrderContent').innerHTML = '<div style="text-align:center;color:#888;margin-top:50px">Aucune course active</div>';
+        }
+    });
+}
+
+function renderActive(id, data) {
+    const isPicked = data.status === 'picked_up';
+    document.getElementById('activeOrderContent').innerHTML = `
+        <div class="active-order-box">
+            <h2>Course en cours</h2>
+            <div class="step-card ${!isPicked?'active':''}">
+                <div class="step-title">📍 ${data.from}</div>
+                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="updateStatus('${id}','picked_up')">📦 Colis Récupéré</button>` : ''}
+            </div>
+            <div class="step-card ${isPicked?'active':''}">
+                <div class="step-title">🏁 ${data.to}</div>
+                <div style="color:#666;margin-bottom:10px">📞 ${data.clientPhone || 'Client'}</div>
+                ${isPicked ? `<button class="btn-action btn-deliver" onclick="updateStatus('${id}','delivered')">✅ Livré</button>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+async function updateStatus(id, st) {
+    if(st === 'delivered') {
+        const gain = 5.00; 
+        const w = parseFloat(localStorage.getItem('alex_wallet')||0) + gain;
+        localStorage.setItem('alex_wallet', w.toFixed(2));
+        document.getElementById('walletAmount').innerText = w.toFixed(2) + " €";
+        alert(`Livré ! +${gain}€`);
+    }
+    await db.collection('orders').doc(id).update({status: st});
+}
+
+function toggleStatus() {
+    isOnline = !isOnline;
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    if(isOnline) {
+        dot.classList.remove('off'); txt.innerText = "En ligne";
+        loadOrders();
+    } else {
+        dot.classList.add('off'); txt.innerText = "Hors ligne";
+        document.getElementById('orders-container').innerHTML = '';
+        document.getElementById('empty-msg').innerText = "Vous êtes hors ligne";
+    }
+}
+
+function openPage(id) {
+    document.querySelectorAll('.full-page').forEach(p => p.style.display = 'none');
+    const p = document.getElementById('page-'+id);
+    if(p) p.style.display = 'flex';
+}
+
+function closeAllPages() {
+    document.querySelectorAll('.full-page').forEach(p => p.style.display = 'none');
+}
+
+function logout() {
+    if(confirm("Se déconnecter ?")) {
+        localStorage.removeItem('alex_courier_logged');
+        window.location.href = 'index.html';
+    }
+}
+
+window.onload = () => {
+    initMap();
+    loadOrders();
+    checkActiveOrder();
+    document.getElementById('profileName').innerText = localStorage.getItem('alex_courier_name') || 'Livreur';
+    document.getElementById('walletAmount').innerText = (localStorage.getItem('alex_wallet')||'0.00') + " €";
+};
+</script>
+</body>
+</html> 
