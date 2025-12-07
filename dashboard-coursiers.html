@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alex Pro">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
 <link rel="manifest" href="./manifest-pro.json">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -78,12 +79,52 @@
   .btn-action {width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; color: #fff;}
   .btn-pickup { background: #ff9800; box-shadow: 0 4px 15px rgba(255,152,0,0.3); }
   .btn-deliver { background: #00c853; box-shadow: 0 4px 15px rgba(0,200,83,0.3); }
+
+  .pwa-install-btn {
+      position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, #6b23ff, #007bff); color: white;
+      padding: 8px 20px; border-radius: 50px; font-weight: 800; font-size: 0.85em;
+      border: none; box-shadow: 0 4px 15px rgba(107, 35, 255, 0.4); z-index: 500;
+      display: none; align-items: center; gap: 8px; cursor: pointer; animation: pulse 2s infinite; white-space: nowrap;
+  }
+  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(107, 35, 255, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(107, 35, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(107, 35, 255, 0); } }
+
+  .ios-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
+      justify-content: center; align-items: flex-end; padding-bottom: 20px;
+  }
+  .ios-content {
+      background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px;
+      text-align: center; position: relative; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ios-content h3 { margin: 0 0 10px 0; color: #333; }
+  .ios-content p { color: #666; margin-bottom: 20px; line-height: 1.5; }
+  .ios-icon { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .ios-arrow { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); font-size: 40px; color: white; animation: bounce 2s infinite; }
+  .ios-close { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #999; cursor: pointer; background: none; border: none; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-10px);} 60% {transform: translateX(-50%) translateY(-5px);} }
 </style>
 </head>
 <body>
 
 <div id="map-layer"></div>
 <img src="logo-pro.jpg" class="map-logo">
+
+<button id="pwaInstallBtn" class="pwa-install-btn">
+    <span class="emoji-anim">📲</span> Installer l'application
+</button>
+
+<div id="iosInstallModal" class="ios-modal">
+    <div class="ios-content">
+        <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'">×</button>
+        <img src="logo-pro.jpg" class="ios-icon" alt="Icon">
+        <h3>Installer l'app</h3>
+        <p>Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
+        <div class="ios-arrow">↓</div>
+    </div>
+</div>
 
 <div class="top-bar">
     <div class="status-pill" onclick="toggleStatus()">
@@ -282,6 +323,14 @@
 </div>
 
 <script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-pro.js')
+            .then(reg => console.log('SW ok'))
+            .catch(err => console.log('SW fail'));
+    });
+}
+
 const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomain:"alex-livraison.firebaseapp.com",projectId:"alex-livraison",storageBucket:"alex-livraison.firebasestorage.app",messagingSenderId:"937475497279",appId:"1:937475497279:web:62dc9eba8e77a5113ec78a"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
@@ -305,6 +354,38 @@ const VEHICLES = [
     "Camion <span class='emoji-anim'>🚛</span>", 
     "Camion Électrique <span class='emoji-anim'>⚡🚛</span>"
 ];
+
+let deferredPrompt;
+const installBtn = document.getElementById('pwaInstallBtn');
+const iosModal = document.getElementById('iosInstallModal');
+const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+if (!isInStandaloneMode) {
+  if (isIos) {
+      installBtn.style.display = 'flex';
+      installBtn.addEventListener('click', () => {
+          iosModal.style.display = 'flex';
+      });
+  } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          installBtn.style.display = 'flex';
+      });
+      installBtn.addEventListener('click', (e) => {
+          if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === 'accepted') {
+                      installBtn.style.display = 'none';
+                  }
+                  deferredPrompt = null;
+              });
+          }
+      });
+  }
+}
 
 function initMap() {
   map = L.map('map-layer', {zoomControl: true, attributionControl: false}).setView([courierLat, courierLon], 13);
@@ -504,4 +585,4 @@ function logout() {
 window.onload = initMap;
 </script>
 </body>
-</html> 
+</html>
