@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Alex Pro">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
 <link rel="manifest" href="./manifest-pro.json">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -19,7 +18,7 @@
   * {box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body {font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:var(--bg); margin:0; padding:0; color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column;}
   #map-layer {position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;}
-  .leaflet-top {top: 110px;}
+  .leaflet-top {top: 130px;}
   .leaflet-control-zoom {display: block !important; visibility: visible !important;}
   .map-logo {position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; box-shadow: var(--shadow); z-index: 20; object-fit: cover; animation: floatLogo 4s ease-in-out infinite;}
   @keyframes floatLogo { 0%,100%{transform:translate(-50%, 0);} 50%{transform:translate(-50%, -5px);} }
@@ -82,13 +81,16 @@
 
   .pwa-install-btn {
       position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg, #6b23ff, #007bff); color: white;
-      padding: 8px 20px; border-radius: 50px; font-weight: 800; font-size: 0.85em;
-      border: none; box-shadow: 0 4px 15px rgba(107, 35, 255, 0.4); z-index: 500;
-      display: none; align-items: center; gap: 8px; cursor: pointer; animation: pulse 2s infinite; white-space: nowrap;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+      color: #6b23ff; border: 2px solid rgba(107, 35, 255, 0.1);
+      padding: 10px 24px; border-radius: 50px; font-weight: 800; font-size: 0.9em;
+      box-shadow: 0 8px 32px rgba(107, 35, 255, 0.25); z-index: 1000;
+      display: flex; align-items: center; gap: 10px; cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); white-space: nowrap;
+      animation: floatBtn 3s ease-in-out infinite;
   }
-  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(107, 35, 255, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(107, 35, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(107, 35, 255, 0); } }
+  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); background: #f0f0f5; }
+  @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-4px);} }
 
   .ios-modal {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
@@ -113,7 +115,7 @@
 <img src="logo-pro.jpg" class="map-logo">
 
 <button id="pwaInstallBtn" class="pwa-install-btn">
-    <span class="emoji-anim">📲</span> Installer l'application
+    <span class="emoji-anim" style="font-size:1.2em">📲</span> Installer l'App
 </button>
 
 <div id="iosInstallModal" class="ios-modal">
@@ -361,30 +363,28 @@ const iosModal = document.getElementById('iosInstallModal');
 const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
-if (!isInStandaloneMode) {
-  if (isIos) {
-      installBtn.style.display = 'flex';
-      installBtn.addEventListener('click', () => {
-          iosModal.style.display = 'flex';
-      });
-  } else {
-      window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          installBtn.style.display = 'flex';
-      });
-      installBtn.addEventListener('click', (e) => {
-          if (deferredPrompt) {
-              deferredPrompt.prompt();
-              deferredPrompt.userChoice.then((choiceResult) => {
-                  if (choiceResult.outcome === 'accepted') {
-                      installBtn.style.display = 'none';
-                  }
-                  deferredPrompt = null;
-              });
-          }
-      });
-  }
+if (isInStandaloneMode) {
+    installBtn.style.display = 'none';
+} else {
+    installBtn.addEventListener('click', () => {
+        if (isIos) {
+            iosModal.style.display = 'flex';
+        } else if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert("Pour installer: Menu navigateur -> Ajouter à l'écran d'accueil");
+        }
+    });
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
 }
 
 function initMap() {
@@ -585,4 +585,4 @@ function logout() {
 window.onload = initMap;
 </script>
 </body>
-</html>
+</html> 
