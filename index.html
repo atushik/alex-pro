@@ -3,24 +3,73 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>Connexion - Alex Pro</title>
+<title>AlexLivraison Pro</title>
 <link rel="manifest" href="./manifest-pro.json">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  body{font-family:'Segoe UI',sans-serif;background:#f2f2f7;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:20px}
-  .card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:100%;max-width:350px}
+  body{font-family:'Segoe UI',sans-serif;background:#f2f2f7;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:20px;overflow:hidden}
+  .card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:100%;max-width:350px;position:relative;z-index:10}
   input{width:100%;padding:15px;margin:10px 0;border:1px solid #ddd;border-radius:12px;font-size:1.2em;text-align:center;letter-spacing:5px;box-sizing:border-box}
   button{width:100%;padding:15px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:10px;transition:0.3s}
   button:active{transform:scale(0.98)}
   .logo{width:90px;height:90px;border-radius:20px;object-fit:cover;margin-bottom:20px;box-shadow:0 4px 15px rgba(107,35,255,0.2)}
   a{text-decoration:none}
+  
+  .pwa-install-btn {
+      position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #6b23ff, #8e5aff);
+      color: white; padding: 12px 25px; border-radius: 50px;
+      font-weight: 800; font-size: 0.95em; border: none;
+      box-shadow: 0 8px 25px rgba(107, 35, 255, 0.4);
+      z-index: 1000; display: none; align-items: center; gap: 10px;
+      cursor: pointer; animation: floatBtn 3s ease-in-out infinite;
+      white-space: nowrap; letter-spacing: 0.5px;
+  }
+  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
+  
+  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.2em; }
+  
+  @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-6px);} }
+  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
+
+  .ios-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
+      justify-content: center; align-items: flex-end; padding-bottom: 20px;
+  }
+  .ios-content {
+      background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px;
+      text-align: center; position: relative; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ios-content h3 { margin: 0 0 10px 0; color: #333; }
+  .ios-content p { color: #666; margin-bottom: 20px; line-height: 1.5; }
+  .ios-icon { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .ios-arrow { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); font-size: 40px; color: white; animation: bounce 2s infinite; }
+  .ios-close { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #999; cursor: pointer; background: none; border: none; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-10px);} 60% {transform: translateX(-50%) translateY(-5px);} }
 </style>
 </head>
 <body>
+
+  <button id="pwaInstallBtn" class="pwa-install-btn">
+      <span class="emoji-anim">📲</span> Installer l'application
+  </button>
+
+  <div id="iosInstallModal" class="ios-modal">
+      <div class="ios-content">
+          <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'">×</button>
+          <img src="logo-pro.jpg" class="ios-icon" alt="Icon">
+          <h3>Installer l'app</h3>
+          <p>Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
+          <div class="ios-arrow">↓</div>
+      </div>
+  </div>
+
   <div class="card">
     <img src="logo-pro.jpg" class="logo">
     <h2 style="margin:0 0 10px 0;color:#333">AlexLivraison Pro</h2>
@@ -40,7 +89,44 @@ const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomai
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(console.error);}
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-pro.js').catch(console.error);
+    });
+}
+
+let deferredPrompt;
+const installBtn = document.getElementById('pwaInstallBtn');
+const iosModal = document.getElementById('iosInstallModal');
+const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+if (!isInStandaloneMode) {
+  if (isIos) {
+      installBtn.style.display = 'flex';
+      installBtn.addEventListener('click', () => {
+          iosModal.style.display = 'flex';
+      });
+  } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          installBtn.style.display = 'flex';
+      });
+      installBtn.addEventListener('click', () => {
+          if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === 'accepted') {
+                      installBtn.style.display = 'none';
+                  }
+                  deferredPrompt = null;
+              });
+          }
+      });
+  }
+}
+
 if(localStorage.getItem('alex_courier_logged')) window.location.href='dashboard-coursiers.html';
 
 async function login() {
