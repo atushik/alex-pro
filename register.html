@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Inscription - Alex Pro</title>
+<link rel="manifest" href="./manifest-pro.json">
+<meta name="theme-color" content="#6b23ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="logo-pro.jpg">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{--violet:#6b23ff;--violet-dark:#32006b;--glass:rgba(255,255,255,0.95);}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f2f2f7;color:#222;margin:0;padding:20px}
+  .wrap{max-width:800px;margin:0 auto;}
+  .card{background:var(--glass);border-radius:20px;padding:30px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);max-width:600px;margin:0 auto 20px;}
+  h2{color:#32006b;margin-top:0;border-bottom:2px solid #eee;padding-bottom:10px;margin-bottom:20px;}
+  .input-group{margin-bottom:15px;}
+  label{display:block;margin-bottom:8px;font-weight:600;color:#555;}
+  input,select{width:100%;padding:14px;border:1px solid #ddd;border-radius:10px;font-size:16px;background:#fff;margin-bottom:0;box-sizing:border-box;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .btn-primary{width:100%;padding:16px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .btn-continue{width:100%;padding:16px;background:#4caf50;color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;display:none;}
+  .file-upload-box {border: 2px dashed #bbb; padding: 15px; border-radius: 10px; background: #f8f9fa; text-align: center; margin-bottom: 10px; cursor:pointer;}
+  canvas#signature{width:100%;height:200px;border:2px dashed #bbb;border-radius:10px;background:#fff;cursor:crosshair;}
+  .hidden{display:none;}
+  .status-msg{text-align:center;margin-top:15px;font-weight:bold;padding:10px;border-radius:8px;background:#fff;}
+  .success {background: #dcfce7; color: #166534;}
+  .error {background: #fee2e2; color: #991b1b;}
+  .emoji-anim{display:inline-block;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div style="text-align:center;margin-bottom:20px">
+      <img src="logo-pro.jpg" style="width:60px;border-radius:50%;border:3px solid #6b23ff">
+      <h2 style="border:none;margin-bottom:0">Devenir Coursier</h2>
+  </div>
+
+  <section id="step1" class="card">
+    <h2>1. Informations Personnelles</h2>
+    <div class="grid2">
+      <div class="input-group"><label>Prénom</label><input id="c_firstname" placeholder="Votre prénom"></div>
+      <div class="input-group"><label>Nom</label><input id="c_lastname" placeholder="Votre nom"></div>
+    </div>
+    <div class="input-group"><label>Civilité</label><select id="c_gender"><option value="M.">Monsieur (M.)</option><option value="Mme">Madame (Mme)</option></select></div>
+    <div class="grid2">
+      <div class="input-group"><label>Téléphone</label><input id="c_phone" type="tel"></div>
+      <div class="input-group"><label>E-mail</label><input id="c_email" type="email"></div>
+    </div>
+    <div class="input-group" style="background:#f3e5f5;padding:10px;border-radius:10px;border:1px solid #6b23ff"><label style="color:#6b23ff">🔐 Mot de Passe (PIN)</label><input id="c_password" type="text" placeholder="Min 6 caractères"></div>
+    <div class="input-group"><label>Adresse complète</label><input id="c_addr" placeholder="Rue, CP, Ville"></div>
+
+    <h2>Info Pro & Véhicule</h2>
+    <div class="grid2">
+      <div class="input-group"><label>SIREN</label><input id="c_siren" maxlength="9"></div>
+      <div class="input-group"><label>SIRET</label><input id="c_siret" maxlength="14"></div>
+    </div>
+    <div class="input-group"><label>Véhicule</label><select id="c_vehicle"><option value="Velo">Vélo 🚲</option><option value="Scooter">Scooter 🛵</option><option value="Voiture">Voiture 🚗</option><option value="Trotinette">Trotinette 🛴</option></select></div>
+
+    <h2>Documents</h2>
+    <div class="input-group"><label>Type de document</label><select id="c_doc_type"><option value="CNI">Carte d'Identité</option><option value="Passeport">Passeport</option><option value="Titre">Titre de séjour</option></select></div>
+    <div class="grid2">
+        <div class="file-upload-box" onclick="document.getElementById('c_doc_front').click()">📷 RECTO<input type="file" id="c_doc_front" accept="image/*" style="display:none" onchange="this.parentElement.style.borderColor='#4caf50'"></div>
+        <div class="file-upload-box" onclick="document.getElementById('c_doc_back').click()">📷 VERSO<input type="file" id="c_doc_back" accept="image/*" style="display:none" onchange="this.parentElement.style.borderColor='#4caf50'"></div>
+    </div>
+    <button id="btn_step1" class="btn-primary">Suivant ➡️</button>
+    <p style="text-align:center;margin-top:15px"><a href="login.html" style="color:#6b23ff">Déjà inscrit ? Connexion</a></p>
+  </section>
+
+  <section id="step2" class="card hidden">
+    <h2>2. Contrat</h2>
+    <p style="font-size:0.9em;color:#666">Signature du contrat de prestation indépendant.</p>
+    <div class="grid2">
+      <div class="input-group"><label>Lieu</label><input id="sign_place" value="Toulon"></div>
+      <div class="input-group"><label>Date</label><input id="sign_date" type="date" readonly></div>
+    </div>
+    <label>Votre signature :</label>
+    <canvas id="signature"></canvas>
+    <button onclick="clearSig()" style="margin-top:5px;padding:5px 10px">Effacer</button>
+    <div style="margin-top:20px;display:flex;gap:10px"><input type="checkbox" id="agree" style="width:auto"><label for="agree" style="margin:0">Je certifie l'exactitude des infos.</label></div>
+    <button id="gen_pdf" class="btn-primary">📝 Signer et Envoyer</button>
+    <div id="final-status" class="status-msg hidden"></div>
+    <button id="btn_continue" class="btn-continue" onclick="window.location.href='login.html'">CONTINUER 🚀</button>
+  </section>
+</div>
+
+<img src="logo-pro.jpg" id="img-logo" style="display:none">
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw-pro.js').catch(console.error);
+}
+
+const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomain:"alex-livraison.firebaseapp.com",projectId:"alex-livraison",storageBucket:"alex-livraison.firebasestorage.app",messagingSenderId:"937475497279",appId:"1:937475497279:web:62dc9eba8e77a5113ec78a"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+const BOT="8003065650:AAGJH_PRNHQ7jVDm9q96G6zlHt-IXkxKHnA";
+const CHAT="7129872491";
+
+const s1=document.getElementById('step1');
+const s2=document.getElementById('step2');
+const inputs=['c_firstname','c_lastname','c_phone','c_addr','c_siren','c_siret','c_email','c_password'];
+
+document.getElementById('btn_step1').onclick=()=>{
+  for(let i of inputs) if(!document.getElementById(i).value.trim()) return alert("Remplissez tout !");
+  if(!document.getElementById('c_doc_front').files[0] || !document.getElementById('c_doc_back').files[0]) return alert("Photos requises !");
+  s1.classList.add('hidden'); s2.classList.remove('hidden'); window.scrollTo(0,0); resizeCanvas();
+};
+
+const cvs=document.getElementById('signature'), ctx=cvs.getContext('2d');
+let dr=false;
+function resizeCanvas(){const r=cvs.getBoundingClientRect();cvs.width=r.width;cvs.height=200;ctx.fillStyle='#fff';ctx.fillRect(0,0,cvs.width,cvs.height);}
+window.addEventListener('resize',resizeCanvas);
+function getPos(e){const r=cvs.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+cvs.addEventListener('mousedown',e=>{dr=true;ctx.beginPath();ctx.moveTo(getPos(e).x,getPos(e).y)});
+cvs.addEventListener('mousemove',e=>{if(dr){ctx.lineTo(getPos(e).x,getPos(e).y);ctx.stroke()}});
+cvs.addEventListener('mouseup',()=>dr=false);
+cvs.addEventListener('touchstart',e=>{e.preventDefault();dr=true;ctx.beginPath();ctx.moveTo(getPos(e).x,getPos(e).y)});
+cvs.addEventListener('touchmove',e=>{e.preventDefault();if(dr){ctx.lineTo(getPos(e).x,getPos(e).y);ctx.stroke()}});
+cvs.addEventListener('touchend',()=>dr=false);
+window.clearSig=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,cvs.width,cvs.height);ctx.beginPath();};
+document.getElementById('sign_date').value=new Date().toISOString().split('T')[0];
+
+function makeCircle(imgId){
+    const img=document.getElementById(imgId);const c=document.createElement('canvas');const s=Math.min(img.width,img.height);c.width=s;c.height=s;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,s,s);x.beginPath();x.arc(s/2,s/2,s/2,0,Math.PI*2);x.closePath();x.save();x.clip();x.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,s,s);x.restore();return c.toDataURL('image/jpeg',0.95);
+}
+
+document.getElementById('gen_pdf').onclick=async()=>{
+  if(!document.getElementById('agree').checked) return alert("Cochez la case.");
+  const btn=document.getElementById('gen_pdf'), status=document.getElementById('final-status');
+  btn.disabled=true; btn.innerText="Envoi..."; status.classList.remove('hidden'); status.innerText="Traitement...";
+  
+  const {jsPDF}=window.jspdf; const doc=new jsPDF();
+  const gender=document.getElementById('c_gender').value, fname=document.getElementById('c_firstname').value, lname=document.getElementById('c_lastname').value, email=document.getElementById('c_email').value, pass=document.getElementById('c_password').value;
+  
+  try {
+    await db.collection('couriers').add({email:email.toLowerCase(),password:pass,fullName:fname+" "+lname,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  } catch(e) { alert("Erreur DB"); btn.disabled=false; return; }
+
+  try{doc.addImage(makeCircle('img-logo'),'JPEG',160,10,30,30);}catch(e){}
+  doc.setFontSize(18);doc.text("CONTRAT COURSIER",20,30);
+  doc.setFontSize(11);
+  doc.text(`Entre AlexLivraison et ${gender} ${lname}`,20,50);
+  doc.text(`Email: ${email}`,20,60);
+  doc.text(`Véhicule: ${document.getElementById('c_vehicle').value}`,20,70);
+  doc.text(`PIN: ${pass}`,20,80);
+  try{doc.addImage(cvs.toDataURL('image/jpeg'),'JPEG',20,100,50,30);}catch(e){}
+  
+  const blob=doc.output('blob');
+  
+  const fd=new FormData();
+  fd.append('chat_id',CHAT);
+  fd.append('caption',`🆕 COURSIER: ${fname} ${lname}\n📞 ${document.getElementById('c_phone').value}`);
+  fd.append('document', new File([blob], `Contrat_${lname}.pdf`, {type:'application/pdf'}));
+  
+  try {
+      await fetch(`https://api.telegram.org/bot${BOT}/sendDocument`,{method:'POST',body:fd});
+      doc.save(`Contrat_${lname}.pdf`);
+      status.innerText="✅ Compte créé !"; status.className="status-msg success";
+      btn.style.display="none"; document.getElementById('btn_continue').style.display="block";
+  } catch(e){ status.innerText="Erreur envoi."; btn.disabled=false; }
+};
+</script>
+</body>
+</html> 
