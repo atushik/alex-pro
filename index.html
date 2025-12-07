@@ -4,38 +4,38 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json?v=999">
+<link rel="manifest" href="./manifest-pro.json?v=fix">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo-pro.jpg?v=999">
+<link rel="apple-touch-icon" href="logo-pro.jpg?v=fix">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
   body{font-family:'Segoe UI',sans-serif;background:#f2f2f7;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:20px;overflow:hidden}
-  .card{background:#fff;padding:20px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:100%;max-width:350px;position:relative;z-index:10;padding-top:30px}
+  .card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:100%;max-width:350px;position:relative;z-index:10}
   input{width:100%;padding:15px;margin:10px 0;border:1px solid #ddd;border-radius:12px;font-size:1.2em;text-align:center;letter-spacing:5px;box-sizing:border-box}
   button{width:100%;padding:15px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:10px;transition:0.3s}
   button:active{transform:scale(0.98)}
-  .logo{width:100%;max-width:320px;height:auto;object-fit:contain;display:block;margin:0 auto 15px auto;}
+  .logo{width:100%;max-width:280px;height:auto;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto}
   a{text-decoration:none}
   
   .pwa-install-btn {
       position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-      color: #6b23ff; padding: 12px 25px; border-radius: 50px;
-      font-weight: 800; font-size: 0.95em; border: 2px solid rgba(107, 35, 255, 0.15);
-      box-shadow: 0 8px 30px rgba(107, 35, 255, 0.3);
+      background: linear-gradient(135deg, #6b23ff, #8e5aff);
+      color: white; padding: 12px 25px; border-radius: 50px;
+      font-weight: 800; font-size: 0.95em; border: none;
+      box-shadow: 0 8px 25px rgba(107, 35, 255, 0.4);
       z-index: 1000; display: none; align-items: center; gap: 10px;
       cursor: pointer; animation: floatBtn 3s ease-in-out infinite;
       white-space: nowrap; letter-spacing: 0.5px;
   }
-  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); background: #f4f4f4; }
+  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
   
-  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.3em; }
+  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.2em; }
   
   @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-6px);} }
-  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg) scale(1);} 50%{transform:rotate(10deg) scale(1.1);} }
+  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
 
   .ios-modal {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
@@ -63,7 +63,7 @@
   <div id="iosInstallModal" class="ios-modal">
       <div class="ios-content">
           <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'">×</button>
-          <img src="logo-pro.jpg" class="ios-icon" alt="Icon">
+          <img src="logo-pro.jpg?v=fix" class="ios-icon" alt="Icon">
           <h3>Installer l'app</h3>
           <p>Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
           <div class="ios-arrow">↓</div>
@@ -71,7 +71,7 @@
   </div>
 
   <div class="card">
-    <img src="logo-pro.jpg" class="logo">
+    <img src="logo-pro.jpg?v=fix" class="logo">
     <h2 style="margin:0 0 10px 0;color:#333">AlexLivraison Pro</h2>
     <p style="color:#666;margin-bottom:25px">Application Réservée aux Livreurs</p>
     
@@ -91,9 +91,9 @@ const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js?v=999').then(reg => {
+        navigator.serviceWorker.register('./sw-pro.js').then(reg => {
             reg.update();
-        }).catch(console.error);
+        });
     });
 }
 
@@ -143,11 +143,13 @@ async function login() {
         if(!snap.empty) {
             const doc = snap.docs[0];
             const data = doc.data();
+            
             if(data.status === 'pending') {
                 alert("Votre compte est en attente de validation par l'administrateur.");
                 btn.innerText = "SE CONNECTER";
                 return;
             }
+            
             localStorage.setItem('alex_courier_logged', 'true');
             localStorage.setItem('alex_courier_id', doc.id);
             localStorage.setItem('alex_courier_name', data.fullName);
