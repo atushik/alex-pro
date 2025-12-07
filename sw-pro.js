@@ -1,10 +1,10 @@
-const CACHE_NAME = 'alex-pro-v2-fix';
+const CACHE_NAME = 'alex-pro-v10-clean';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json?v=2',
+  './manifest-pro.json?v=10',
   './logo-pro.jpg'
 ];
 
