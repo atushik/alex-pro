@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Inscription Coursier - Alex Pro</title>
+<link rel="manifest" href="./manifest-pro.json">
+<meta name="theme-color" content="#6b23ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="logo-pro.jpg">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{--primary:#6b23ff;--bg:#f2f2f7;--white:#ffffff;}
+  body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#222;margin:0;padding:20px;padding-bottom:50px}
+  .header{text-align:center;margin-bottom:20px}
+  .header img{width:60px;height:60px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
+  .header h2{color:#32006b;margin:10px 0 0 0}
+  .card{background:var(--white);border-radius:20px;padding:25px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.05);max-width:600px;margin-left:auto;margin-right:auto}
+  h3{border-bottom:2px solid #f0f0f0;padding-bottom:10px;margin-top:0;color:#555;font-size:1.1em}
+  .input-group{margin-bottom:15px}
+  label{display:block;margin-bottom:6px;font-weight:600;color:#666;font-size:0.9em}
+  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px;background:#f9f9f9;box-sizing:border-box;transition:0.3s}
+  input:focus,select:focus{border-color:var(--primary);background:#fff;outline:none}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  .upload-box{border:2px dashed #ccc;padding:15px;border-radius:12px;text-align:center;background:#fafafa;cursor:pointer;transition:0.3s;position:relative}
+  .upload-box:active{background:#eee}
+  .upload-box.done{border-color:#00c853;background:#e8f5e9;color:#00c853}
+  .upload-icon{font-size:24px;display:block;margin-bottom:5px}
+  .btn-next{width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:20px;box-shadow:0 4px 15px rgba(107,35,255,0.3)}
+  .btn-back{background:none;border:none;color:#888;font-weight:600;cursor:pointer;margin-top:10px}
+  canvas#signature{width:100%;height:180px;border:1px solid #ddd;border-radius:12px;background:#fff;touch-action:none}
+  .hidden{display:none}
+  .status-msg{padding:15px;border-radius:10px;text-align:center;font-weight:bold;margin-top:15px}
+  .success{background:#dcfce7;color:#166534}
+  .error{background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="logo-pro.jpg">
+  <h2>Devenir Coursier</h2>
+</div>
+
+<div id="step1" class="card">
+  <h3>1. Informations Personnelles</h3>
+  <div class="input-group">
+      <label>Civilité</label>
+      <select id="c_gender">
+          <option value="M.">Monsieur</option>
+          <option value="Mme">Madame</option>
+      </select>
+  </div>
+  <div class="grid-2">
+      <div class="input-group"><label>Prénom</label><input type="text" id="c_firstname" placeholder="Ex: Alex"></div>
+      <div class="input-group"><label>Nom</label><input type="text" id="c_lastname" placeholder="Ex: Dupont"></div>
+  </div>
+  <div class="input-group"><label>Téléphone Mobile</label><input type="tel" id="c_phone" placeholder="06..."></div>
+  <div class="input-group"><label>Email</label><input type="email" id="c_email" placeholder="email@exemple.com"></div>
+  <div class="input-group" style="background:#f0f2f5;padding:10px;border-radius:10px;border-left:4px solid var(--primary)">
+      <label style="color:var(--primary)">Créer votre code PIN (Connexion)</label>
+      <input type="text" id="c_password" placeholder="Min 6 chiffres" maxlength="8" style="background:#fff">
+  </div>
+  <div class="input-group"><label>Adresse de résidence</label><input type="text" id="c_addr" placeholder="Numéro, Rue, Code Postal, Ville"></div>
+  <button class="btn-next" onclick="goToStep(2)">Suivant (Documents) ➔</button>
+  <center><button class="btn-back" onclick="window.location.href='index.html'">Retour connexion</button></center>
+</div>
+
+<div id="step2" class="card hidden">
+  <h3>2. Justificatifs & Véhicule</h3>
+  <div class="grid-2">
+      <div class="input-group"><label>SIREN (9 chiffres)</label><input type="tel" id="c_siren" maxlength="9"></div>
+      <div class="input-group"><label>SIRET (14 chiffres)</label><input type="tel" id="c_siret" maxlength="14"></div>
+  </div>
+  <div class="input-group">
+      <label>Type de véhicule</label>
+      <select id="c_vehicle">
+          <option value="Scooter">Scooter 🛵</option>
+          <option value="Velo">Vélo 🚲</option>
+          <option value="Voiture">Voiture 🚗</option>
+          <option value="Moto">Moto 🏍️</option>
+          <option value="Trotinette">Trotinette 🛴</option>
+      </select>
+  </div>
+  <label>Identité (CNI / Passeport / Titre séjour)</label>
+  <div class="grid-2" style="margin-bottom:15px">
+      <div class="upload-box" onclick="document.getElementById('file_id_front').click()">
+          <span class="upload-icon">📷</span>Recto
+          <input type="file" id="file_id_front" hidden accept="image/*" onchange="markDone(this)">
+      </div>
+      <div class="upload-box" onclick="document.getElementById('file_id_back').click()">
+          <span class="upload-icon">📷</span>Verso
+          <input type="file" id="file_id_back" hidden accept="image/*" onchange="markDone(this)">
+      </div>
+  </div>
+  <label>Justificatif de Domicile (Adrs)</label>
+  <div style="margin-bottom:5px;font-size:0.8em;color:#888">EDF, Eau, Internet, ou RIB avec adresse.</div>
+  <div class="upload-box" onclick="document.getElementById('file_addr_proof').click()">
+      <span class="upload-icon">📄</span> Photo du document
+      <input type="file" id="file_addr_proof" hidden accept="image/*" onchange="markDone(this)">
+  </div>
+  <button class="btn-next" onclick="goToStep(3)">Suivant (Contrat) ➔</button>
+  <center><button class="btn-back" onclick="goToStep(1)">Retour</button></center>
+</div>
+
+<div id="step3" class="card hidden">
+  <h3>3. Signature du contrat</h3>
+  <p style="font-size:0.9em;color:#666">Je certifie l'exactitude des informations fournies et accepte les conditions de partenariat AlexLivraison.</p>
+  <canvas id="signature"></canvas>
+  <button class="btn-back" onclick="clearSig()" style="font-size:0.9em;color:red;margin-bottom:15px">Effacer la signature</button>
+  <button id="btn_submit" class="btn-next" onclick="submitForm()">✅ Envoyer ma candidature</button>
+  <div id="status_box" class="hidden"></div>
+  <center><button class="btn-back" onclick="goToStep(2)">Retour</button></center>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomain:"alex-livraison.firebaseapp.com",projectId:"alex-livraison",storageBucket:"alex-livraison.firebasestorage.app",messagingSenderId:"937475497279",appId:"1:937475497279:web:62dc9eba8e77a5113ec78a"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+const TG_BOT="8003065650:AAGJH_PRNHQ7jVDm9q96G6zlHt-IXkxKHnA"; 
+const TG_CHAT="7129872491";
+
+function goToStep(n){
+    document.querySelectorAll('.card').forEach(c=>c.classList.add('hidden'));
+    document.getElementById('step'+n).classList.remove('hidden');
+    window.scrollTo(0,0);
+    if(n===3) resizeCanvas();
+}
+
+function markDone(input){
+    if(input.files && input.files[0]) input.parentElement.classList.add('done');
+}
+
+const cvs=document.getElementById('signature'), ctx=cvs.getContext('2d');
+let dr=false;
+function resizeCanvas(){const r=cvs.getBoundingClientRect();cvs.width=r.width;cvs.height=180;ctx.lineWidth=2;ctx.lineCap='round';}
+function getPos(e){const r=cvs.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top}}
+cvs.addEventListener('mousedown',e=>{dr=true;ctx.beginPath();ctx.moveTo(getPos(e).x,getPos(e).y)});
+cvs.addEventListener('mousemove',e=>{if(dr){ctx.lineTo(getPos(e).x,getPos(e).y);ctx.stroke()}});
+cvs.addEventListener('mouseup',()=>dr=false);
+cvs.addEventListener('touchstart',e=>{e.preventDefault();dr=true;ctx.beginPath();ctx.moveTo(getPos(e).x,getPos(e).y)});
+cvs.addEventListener('touchmove',e=>{e.preventDefault();if(dr){ctx.lineTo(getPos(e).x,getPos(e).y);ctx.stroke()}});
+cvs.addEventListener('touchend',()=>dr=false);
+function clearSig(){ctx.clearRect(0,0,cvs.width,cvs.height);ctx.beginPath();}
+
+async function submitForm(){
+    const fields = ['c_firstname','c_lastname','c_phone','c_email','c_password','c_addr','c_siren'];
+    for(let f of fields) if(!document.getElementById(f).value) return alert("Veuillez remplir tous les champs obligatoires.");
+    
+    if(!document.getElementById('file_id_front').files[0] || !document.getElementById('file_addr_proof').files[0]) 
+        return alert("Veuillez ajouter les photos des documents.");
+
+    const btn = document.getElementById('btn_submit');
+    const status = document.getElementById('status_box');
+    btn.disabled=true; btn.innerText="Envoi en cours..."; status.classList.remove('hidden'); status.className="status-msg"; status.innerText="Traitement des données...";
+
+    const data = {
+        fullName: document.getElementById('c_firstname').value + " " + document.getElementById('c_lastname').value,
+        phone: document.getElementById('c_phone').value,
+        email: document.getElementById('c_email').value.toLowerCase(),
+        password: document.getElementById('c_password').value,
+        address: document.getElementById('c_addr').value,
+        siren: document.getElementById('c_siren').value,
+        siret: document.getElementById('c_siret').value,
+        vehicle: document.getElementById('c_vehicle').value,
+        gender: document.getElementById('c_gender').value,
+        status: 'pending', 
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        await db.collection('couriers').add(data);
+        
+        const {jsPDF} = window.jspdf; 
+        const doc = new jsPDF();
+        doc.setFontSize(20); doc.text("DEMANDE COURSIER", 20, 20);
+        doc.setFontSize(12);
+        doc.text(`Nom: ${data.fullName}`, 20, 40);
+        doc.text(`Tel: ${data.phone}`, 20, 50);
+        doc.text(`Email: ${data.email}`, 20, 60);
+        doc.text(`Véhicule: ${data.vehicle}`, 20, 70);
+        doc.text(`Adresse: ${data.address}`, 20, 80);
+        doc.text(`SIREN: ${data.siren}`, 20, 90);
+        
+        try { doc.addImage(cvs.toDataURL('image/jpeg'), 'JPEG', 20, 110, 50, 30); } catch(e){}
+        
+        const blob = doc.output('blob');
+        const fd = new FormData();
+        fd.append('chat_id', TG_CHAT);
+        fd.append('caption', `🔔 NOUVEAU COURSIER EN ATTENTE\n👤 ${data.fullName}\n📞 ${data.phone}\nVEUILLEZ VÉRIFIER DANS L'ADMIN.`);
+        fd.append('document', new File([blob], `Contrat_${data.fullName}.pdf`, {type:'application/pdf'}));
+        
+        fetch(`https://api.telegram.org/bot${TG_BOT}/sendDocument`, {method:'POST', body:fd});
+
+        status.innerText = "✅ Inscription réussie ! En attente de validation.";
+        status.classList.add('success');
+        
+        setTimeout(()=>{
+            alert("Votre demande a été envoyée. Vous pourrez vous connecter une fois votre compte validé par l'administration.");
+            window.location.href = 'index.html';
+        }, 3000);
+
+    } catch(e) {
+        console.error(e);
+        status.innerText = "Erreur: " + e.message;
+        status.classList.add('error');
+        btn.disabled=false; btn.innerText="Réessayer";
+    }
+}
+</script>
+</body>
+</html> 
