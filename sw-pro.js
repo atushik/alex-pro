@@ -1,11 +1,11 @@
-const CACHE_NAME = 'alex-pro-v10-clean';
+const CACHE_NAME = 'alex-pro-cache-v999';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json?v=10',
-  './logo-pro.jpg'
+  './manifest-pro.json?v=999',
+  './logo-pro.jpg?v=999'
 ];
 
 self.addEventListener('install', event => {
@@ -33,4 +33,4 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
-});
+}); 
