@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json">
+<link rel="manifest" href="./manifest-pro.json?v=2">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,7 +17,7 @@
   input{width:100%;padding:15px;margin:10px 0;border:1px solid #ddd;border-radius:12px;font-size:1.2em;text-align:center;letter-spacing:5px;box-sizing:border-box}
   button{width:100%;padding:15px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:10px;transition:0.3s}
   button:active{transform:scale(0.98)}
-  .logo{width:100%;max-width:300px;height:auto;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto;border-radius:0;box-shadow:none;}
+  .logo{width:100%;max-width:280px;height:auto;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto}
   a{text-decoration:none}
   
   .pwa-install-btn {
@@ -47,7 +47,7 @@
   }
   .ios-content h3 { margin: 0 0 10px 0; color: #333; }
   .ios-content p { color: #666; margin-bottom: 20px; line-height: 1.5; }
-  .ios-icon { width: 80px; height: 80px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .ios-icon { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
   .ios-arrow { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); font-size: 40px; color: white; animation: bounce 2s infinite; }
   .ios-close { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #999; cursor: pointer; background: none; border: none; }
   @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
@@ -91,7 +91,9 @@ const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js').catch(console.error);
+        navigator.serviceWorker.register('./sw-pro.js').then(reg => {
+            reg.update();
+        }).catch(console.error);
     });
 }
 
