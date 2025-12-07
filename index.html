@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json?v=2">
+<link rel="manifest" href="./manifest-pro.json?v=10">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,25 +17,25 @@
   input{width:100%;padding:15px;margin:10px 0;border:1px solid #ddd;border-radius:12px;font-size:1.2em;text-align:center;letter-spacing:5px;box-sizing:border-box}
   button{width:100%;padding:15px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:10px;transition:0.3s}
   button:active{transform:scale(0.98)}
-  .logo{width:100%;max-width:280px;height:auto;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto}
+  .logo{width:100%;height:auto;object-fit:contain;margin-bottom:20px;display:block;}
   a{text-decoration:none}
   
   .pwa-install-btn {
-      position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #6b23ff, #8e5aff);
-      color: white; padding: 12px 25px; border-radius: 50px;
-      font-weight: 800; font-size: 0.95em; border: none;
-      box-shadow: 0 8px 25px rgba(107, 35, 255, 0.4);
-      z-index: 1000; display: none; align-items: center; gap: 10px;
+      position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+      color: #6b23ff; padding: 12px 30px; border-radius: 50px;
+      font-weight: 800; font-size: 1em; border: 2px solid rgba(107, 35, 255, 0.1);
+      box-shadow: 0 10px 40px rgba(107, 35, 255, 0.2);
+      z-index: 1000; display: none; align-items: center; gap: 12px;
       cursor: pointer; animation: floatBtn 3s ease-in-out infinite;
-      white-space: nowrap; letter-spacing: 0.5px;
+      white-space: nowrap; transition: 0.3s;
   }
-  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
+  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); background: #fff; }
   
-  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.2em; }
+  .emoji-anim { display: inline-block; font-size: 1.4em; animation: stickerPulse 2s infinite; }
   
-  @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-6px);} }
-  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
+  @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-8px);} }
+  @keyframes stickerPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
   .ios-modal {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
@@ -57,7 +57,7 @@
 <body>
 
   <button id="pwaInstallBtn" class="pwa-install-btn">
-      <span class="emoji-anim">📲</span> Installer l'application
+      <span class="emoji-anim">📲</span> Installer l'App Pro
   </button>
 
   <div id="iosInstallModal" class="ios-modal">
@@ -91,7 +91,7 @@ const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js').then(reg => {
+        navigator.serviceWorker.register('./sw-pro.js?v=10').then(reg => {
             reg.update();
         }).catch(console.error);
     });
