@@ -1,9 +1,7 @@
 {
-  "id": "alex-pro-app-v4-final",
   "name": "AlexLivraison Pro",
   "short_name": "Alex Pro",
-  "start_url": "./dashboard.html",
-  "scope": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f2f2f7",
   "theme_color": "#6b23ff",
@@ -12,14 +10,12 @@
     {
       "src": "logo-pro.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "type": "image/jpeg"
     },
     {
       "src": "logo-pro.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "type": "image/jpeg"
     }
   ]
 } 
