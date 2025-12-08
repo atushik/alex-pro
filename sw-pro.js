@@ -1,10 +1,10 @@
-const CACHE_NAME = 'alex-pro-v-update3';
+const CACHE_NAME = 'alex-pro-v-smaller';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json',
+  './manifest-pro.json?v=SMALLER',
   './logo-pro.jpg'
 ];
 
