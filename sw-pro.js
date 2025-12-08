@@ -1,11 +1,11 @@
-const CACHE_NAME = 'alex-pro-v-adjust';
+const CACHE_NAME = 'alex-pro-v-max-size-fix';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json?v=ADJUST',
-  './logo-pro.jpg?v=ADJUST'
+  './manifest-pro.json?v=MAX',
+  './logo-pro.jpg?v=MAX'
 ];
 
 self.addEventListener('install', event => {
