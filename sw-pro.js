@@ -1,11 +1,11 @@
-const CACHE_NAME = 'alex-pro-v-size25';
+const CACHE_NAME = 'alex-pro-v-bigger-25';
 const urlsToCache = [
   './',
   './index.html',
   './dashboard-coursiers.html',
   './devenir-coursiers.html',
-  './manifest-pro.json?v=SIZE25',
-  './logo-pro.jpg?v=SIZE25'
+  './manifest-pro.json?v=BIGGER25',
+  './logo-pro.jpg?v=BIGGER25'
 ];
 
 self.addEventListener('install', event => {
