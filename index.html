@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json?v=ADJUST">
+<link rel="manifest" href="./manifest-pro.json?v=MAX">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo-pro.jpg?v=ADJUST">
+<link rel="apple-touch-icon" href="logo-pro.jpg?v=MAX">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
@@ -63,7 +63,7 @@
   <div id="iosInstallModal" class="ios-modal">
       <div class="ios-content">
           <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'">×</button>
-          <img src="logo-pro.jpg?v=ADJUST" class="ios-icon" alt="Icon">
+          <img src="logo-pro.jpg" class="ios-icon" alt="Icon">
           <h3>Installer l'app</h3>
           <p>Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
           <div class="ios-arrow">↓</div>
@@ -71,7 +71,7 @@
   </div>
 
   <div class="card">
-    <img src="logo-pro.jpg?v=ADJUST" class="logo">
+    <img src="logo-pro.jpg?v=MAX" class="logo">
     <h2 style="margin:0 0 10px 0;color:#333">AlexLivraison Pro</h2>
     <p style="color:#666;margin-bottom:25px">Application Réservée aux Livreurs</p>
     
@@ -91,7 +91,7 @@ const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js?v=ADJUST').then(reg => {
+        navigator.serviceWorker.register('./sw-pro.js?v=MAX').then(reg => {
             reg.update();
         }).catch(console.error);
     });
