@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json?v=BIGGER25">
+<link rel="manifest" href="./manifest-pro.json?v=FINAL_SIZE">
 <meta name="theme-color" content="#6b23ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo-pro.jpg?v=BIGGER25">
+<link rel="apple-touch-icon" href="logo-pro.jpg?v=FINAL_SIZE">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
@@ -91,7 +91,7 @@ const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js?v=BIGGER25').then(reg => {
+        navigator.serviceWorker.register('./sw-pro.js?v=FINAL_SIZE').then(reg => {
             reg.update();
         }).catch(console.error);
     });
@@ -165,4 +165,4 @@ async function login() {
 }
 </script>
 </body>
-</html>
+</html> 
