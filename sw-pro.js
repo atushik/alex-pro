@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alex-pro-v-final-fix';
+const CACHE_NAME = 'alex-pro-v-update3';
 const urlsToCache = [
   './',
   './index.html',
