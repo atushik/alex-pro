@@ -5,46 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
 <link rel="manifest" href="./manifest-pro.json?v=FINAL_SIZE">
-<meta name="theme-color" content="#6b23ff">
+<meta name="theme-color" content="#052e16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="logo-pro.jpg?v=FINAL_SIZE">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  body{font-family:'Segoe UI',sans-serif;background:#f2f2f7;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:20px;overflow:hidden}
-  .card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:100%;max-width:350px;position:relative;z-index:10}
-  input{width:100%;padding:15px;margin:10px 0;border:1px solid #ddd;border-radius:12px;font-size:1.2em;text-align:center;letter-spacing:5px;box-sizing:border-box}
-  button{width:100%;padding:15px;background:#6b23ff;color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:10px;transition:0.3s}
-  button:active{transform:scale(0.98)}
-  .logo{width:100%;max-width:300px;height:auto;object-fit:contain;margin-bottom:20px;display:block;margin-left:auto;margin-right:auto}
-  a{text-decoration:none}
-  
-  .pwa-install-btn {
-      position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #6b23ff, #8e5aff);
-      color: white; padding: 12px 25px; border-radius: 50px;
-      font-weight: 800; font-size: 0.95em; border: none;
-      box-shadow: 0 8px 25px rgba(107, 35, 255, 0.4);
-      z-index: 1000; display: none; align-items: center; gap: 10px;
-      cursor: pointer; animation: floatBtn 3s ease-in-out infinite;
-      white-space: nowrap; letter-spacing: 0.5px;
-  }
-  .pwa-install-btn:active { transform: translateX(-50%) scale(0.95); }
-  
-  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.2em; }
-  
-  @keyframes floatBtn { 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,-6px);} }
-  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-10deg);} 75%{transform:rotate(10deg);} }
-
-  .ios-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000;
-      justify-content: center; align-items: flex-end; padding-bottom: 20px;
-  }
-  .ios-content {
-      background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px;
-      text-align: center; position: relative; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+  :root { --primary: #00c853; --dark-green: #052e16; --light-green: #e8f5e9; }
+  body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #052e16 0%, #004d40 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; overflow: hidden; position: relative; }
+  .bg-logos { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
+  .floating-logo { position: absolute; width: 60px; height: 60px; border-radius: 50%; opacity: 0.1; animation: floatUp 15s linear infinite; object-fit: cover; }
+  .floating-logo:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
+  .floating-logo:nth-child(2) { left: 30%; animation-duration: 18s; animation-delay: 2s; }
+  .floating-logo:nth-child(3) { left: 70%; animation-duration: 15s; animation-delay: 4s; }
+  .floating-logo:nth-child(4) { left: 90%; animation-duration: 20s; animation-delay: 1s; }
+  .floating-logo:nth-child(5) { left: 50%; animation-duration: 25s; animation-delay: 5s; }
+  @keyframes floatUp { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
+  .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 100%; max-width: 360px; position: relative; z-index: 10; border: 1px solid rgba(255,255,255,0.2); }
+  input { width: 100%; padding: 16px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 14px; font-size: 1.2em; text-align: center; letter-spacing: 5px; box-sizing: border-box; transition: 0.3s; background: #f9f9f9; outline: none; }
+  input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(0, 200, 83, 0.1); }
+  .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, #00c853, #009624); color: #fff; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-main:active { transform: scale(0.98); }
+  .btn-secondary { background: linear-gradient(135deg, #1e88e5, #1565c0); box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3); margin-top: 15px; }
+  .btn-install { background: linear-gradient(135deg, #ff6f00, #e65100); box-shadow: 0 5px 15px rgba(255, 111, 0, 0.3); margin-top: 15px; }
+  .logo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border: 4px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.3em; }
+  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg) translateY(0);} 25%{transform:rotate(-10deg) translateY(-2px);} 75%{transform:rotate(10deg) translateY(-2px);} }
+  .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: flex-end; padding-bottom: 20px; }
+  .ios-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; text-align: center; position: relative; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
   .ios-content h3 { margin: 0 0 10px 0; color: #333; }
   .ios-content p { color: #666; margin-bottom: 20px; line-height: 1.5; }
   .ios-icon { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -56,9 +45,13 @@
 </head>
 <body>
 
-  <button id="pwaInstallBtn" class="pwa-install-btn">
-      <span class="emoji-anim">📲</span> Installer l'application
-  </button>
+  <div class="bg-logos">
+    <img src="logo-pro.jpg" class="floating-logo">
+    <img src="logo-pro.jpg" class="floating-logo">
+    <img src="logo-pro.jpg" class="floating-logo">
+    <img src="logo-pro.jpg" class="floating-logo">
+    <img src="logo-pro.jpg" class="floating-logo">
+  </div>
 
   <div id="iosInstallModal" class="ios-modal">
       <div class="ios-content">
@@ -72,16 +65,16 @@
 
   <div class="card">
     <img src="logo-pro.jpg" class="logo">
-    <h2 style="margin:0 0 10px 0;color:#333">AlexLivraison Pro</h2>
-    <p style="color:#666;margin-bottom:25px">Application Réservée aux Livreurs</p>
+    <h2 style="margin:0 0 5px 0; color:#1b5e20; font-weight:900">AlexLivraison Pro</h2>
+    <p style="color:#555; margin-bottom:20px; font-weight:600"><span class="emoji-anim">⚡</span> Espace Livreurs</p>
     
     <input type="password" id="pin" placeholder="Code PIN" maxlength="8">
-    <button onclick="login()">SE CONNECTER</button>
+    <button class="btn-main" onclick="login()"><span class="emoji-anim">🔐</span> SE CONNECTER</button>
+    <button class="btn-main btn-secondary" onclick="window.location.href='devenir-coursiers.html'"><span class="emoji-anim">📝</span> CRÉER UN COMPTE</button>
     
-    <div style="margin-top:25px;border-top:1px solid #eee;padding-top:20px">
-        <p style="margin:0;font-size:0.9em;color:#888">Vous n'avez pas de compte ?</p>
-        <a href="devenir-coursiers.html" style="display:block;margin-top:10px;color:#6b23ff;font-weight:700">Créer un compte Coursier</a>
-    </div>
+    <button id="pwaInstallBtn" class="btn-main btn-install" style="display:none">
+        <span class="emoji-anim">📱</span> INSTALLER L'APP
+    </button>
   </div>
 
 <script>
@@ -135,8 +128,9 @@ async function login() {
     const pin = document.getElementById('pin').value.trim();
     if(!pin) return alert("Veuillez entrer votre code PIN");
     
-    const btn = document.querySelector('button');
-    btn.innerText = "Vérification...";
+    const btn = document.querySelector('.btn-main');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⌛ Vérification...";
     
     try {
         const snap = await db.collection('couriers').where('password', '==', pin).get();
@@ -146,7 +140,7 @@ async function login() {
             
             if(data.status === 'pending') {
                 alert("Votre compte est en attente de validation par l'administrateur.");
-                btn.innerText = "SE CONNECTER";
+                btn.innerHTML = originalText;
                 return;
             }
             
@@ -156,11 +150,11 @@ async function login() {
             window.location.href = 'dashboard-coursiers.html';
         } else {
             alert("Code PIN incorrect ou compte introuvable.");
-            btn.innerText = "SE CONNECTER";
+            btn.innerHTML = originalText;
         }
     } catch(e) { 
         alert("Erreur de connexion. Vérifiez internet.");
-        btn.innerText = "SE CONNECTER";
+        btn.innerHTML = originalText;
     }
 }
 </script>
