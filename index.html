@@ -28,7 +28,7 @@
   .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, #00c853, #009624); color: #fff; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
   .btn-main:active { transform: scale(0.98); }
   .btn-secondary { background: linear-gradient(135deg, #1e88e5, #1565c0); box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3); margin-top: 15px; }
-  .btn-install { background: linear-gradient(135deg, #ff6f00, #e65100); box-shadow: 0 5px 15px rgba(255, 111, 0, 0.3); margin-top: 15px; }
+  .btn-install { background: linear-gradient(135deg, #ff6f00, #e65100); box-shadow: 0 5px 15px rgba(255, 111, 0, 0.3); margin-top: 15px; display: flex; }
   .logo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border: 4px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
   .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.3em; }
   @keyframes stickerFloat { 0%,100%{transform:rotate(0deg) translateY(0);} 25%{transform:rotate(-10deg) translateY(-2px);} 75%{transform:rotate(10deg) translateY(-2px);} }
@@ -72,8 +72,8 @@
     <button class="btn-main" onclick="login()"><span class="emoji-anim">🔐</span> SE CONNECTER</button>
     <button class="btn-main btn-secondary" onclick="window.location.href='devenir-coursiers.html'"><span class="emoji-anim">📝</span> CRÉER UN COMPTE</button>
     
-    <button id="pwaInstallBtn" class="btn-main btn-install" style="display:none">
-        <span class="emoji-anim">📱</span> INSTALLER L'APP
+    <button id="pwaInstallBtn" class="btn-main btn-install">
+        <span class="emoji-anim">📲</span> INSTALLER L'APP
     </button>
   </div>
 
@@ -96,30 +96,32 @@ const iosModal = document.getElementById('iosInstallModal');
 const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
-if (!isInStandaloneMode) {
-  if (isIos) {
-      installBtn.style.display = 'flex';
-      installBtn.addEventListener('click', () => {
-          iosModal.style.display = 'flex';
-      });
-  } else {
-      window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          installBtn.style.display = 'flex';
-      });
-      installBtn.addEventListener('click', () => {
-          if (deferredPrompt) {
-              deferredPrompt.prompt();
-              deferredPrompt.userChoice.then((choiceResult) => {
-                  if (choiceResult.outcome === 'accepted') {
-                      installBtn.style.display = 'none';
-                  }
-                  deferredPrompt = null;
-              });
-          }
-      });
-  }
+if (isInStandaloneMode) {
+    installBtn.style.display = 'none';
+} else {
+    if (isIos) {
+        installBtn.addEventListener('click', () => {
+            iosModal.style.display = 'flex';
+        });
+    } else {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        installBtn.addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("Pour installer: Options navigateur -> Ajouter à l'écran d'accueil");
+            }
+        });
+    }
 }
 
 if(localStorage.getItem('alex_courier_logged')) window.location.href='dashboard-coursiers.html';
