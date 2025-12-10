@@ -5,39 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Inscription Coursier - Alex Pro</title>
 <link rel="manifest" href="./manifest-pro.json">
-<meta name="theme-color" content="#6b23ff">
+<meta name="theme-color" content="#052e16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  :root{--primary:#6b23ff;--bg:#f2f2f7;--white:#ffffff;}
-  body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#222;margin:0;padding:20px;padding-bottom:50px}
-  .header{text-align:center;margin-bottom:20px}
-  .header img{width:60px;height:60px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
-  .header h2{color:#32006b;margin:10px 0 0 0}
-  .card{background:var(--white);border-radius:20px;padding:25px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.05);max-width:600px;margin-left:auto;margin-right:auto}
-  h3{border-bottom:2px solid #f0f0f0;padding-bottom:10px;margin-top:0;color:#555;font-size:1.1em}
+  :root{--primary:#00c853;--dark:#052e16;--white:#ffffff;}
+  body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#052e16 0%,#004d40 100%);color:#333;margin:0;padding:20px;padding-bottom:50px;min-height:100vh;position:relative;overflow-x:hidden}
+  .bg-logos{position:fixed;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:0;pointer-events:none}
+  .floating-logo{position:absolute;width:60px;height:60px;border-radius:50%;opacity:0.1;animation:floatUp 15s linear infinite;object-fit:cover}
+  .floating-logo:nth-child(1){left:10%;animation-duration:12s;animation-delay:0s}
+  .floating-logo:nth-child(2){left:30%;animation-duration:18s;animation-delay:2s}
+  .floating-logo:nth-child(3){left:70%;animation-duration:15s;animation-delay:4s}
+  .floating-logo:nth-child(4){left:90%;animation-duration:20s;animation-delay:1s}
+  .floating-logo:nth-child(5){left:50%;animation-duration:25s;animation-delay:5s}
+  @keyframes floatUp{0%{transform:translateY(110vh) rotate(0deg)}100%{transform:translateY(-10vh) rotate(360deg)}}
+  .header{text-align:center;margin-bottom:20px;position:relative;z-index:10}
+  .header img{width:80px;height:80px;border-radius:50%;border:3px solid var(--primary);object-fit:cover;box-shadow:0 5px 15px rgba(0,0,0,0.3)}
+  .header h2{color:#fff;margin:10px 0 0 0;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
+  .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;padding:25px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);max-width:600px;margin-left:auto;margin-right:auto;position:relative;z-index:10;border:1px solid rgba(255,255,255,0.1)}
+  h3{border-bottom:2px solid #e0e0e0;padding-bottom:10px;margin-top:0;color:#1b5e20;font-size:1.2em;font-weight:700}
   .input-group{margin-bottom:15px}
-  label{display:block;margin-bottom:6px;font-weight:600;color:#666;font-size:0.9em}
-  input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px;background:#f9f9f9;box-sizing:border-box;transition:0.3s}
-  input:focus,select:focus{border-color:var(--primary);background:#fff;outline:none}
+  label{display:block;margin-bottom:6px;font-weight:600;color:#2e7d32;font-size:0.9em}
+  input,select{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;background:#f9f9f9;box-sizing:border-box;transition:0.3s}
+  input:focus,select:focus{border-color:var(--primary);background:#fff;outline:none;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-  .upload-box{border:2px dashed #ccc;padding:15px;border-radius:12px;text-align:center;background:#fafafa;cursor:pointer;transition:0.3s;position:relative}
-  .upload-box:active{background:#eee}
-  .upload-box.done{border-color:#00c853;background:#e8f5e9;color:#00c853}
+  .upload-box{border:2px dashed #a5d6a7;padding:15px;border-radius:12px;text-align:center;background:#f1f8e9;cursor:pointer;transition:0.3s}
+  .upload-box:active{background:#e8f5e9;border-color:var(--primary)}
+  .upload-box.done{border-color:#00c853;background:#dcfce7;color:#1b5e20}
   .upload-icon{font-size:24px;display:block;margin-bottom:5px}
-  .btn-next{width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:20px;box-shadow:0 4px 15px rgba(107,35,255,0.3)}
-  .btn-back{background:none;border:none;color:#888;font-weight:600;cursor:pointer;margin-top:10px}
-  canvas#signature{width:100%;height:180px;border:1px solid #ddd;border-radius:12px;background:#fff;touch-action:none}
+  .btn-next{width:100%;padding:16px;background:linear-gradient(135deg,#00c853,#009624);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:800;cursor:pointer;margin-top:20px;box-shadow:0 5px 15px rgba(0,200,83,0.3);text-transform:uppercase;transition:0.3s}
+  .btn-next:active{transform:scale(0.98)}
+  .btn-back{background:none;border:none;color:#666;font-weight:600;cursor:pointer;margin-top:15px;font-size:0.95em}
+  canvas#signature{width:100%;height:180px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;touch-action:none}
   .hidden{display:none}
   .status-msg{padding:15px;border-radius:10px;text-align:center;font-weight:bold;margin-top:15px}
   .success{background:#dcfce7;color:#166534}
   .error{background:#fee2e2;color:#991b1b}
+  .emoji-anim{display:inline-block;animation:stickerFloat 2s ease-in-out infinite}
+  @keyframes stickerFloat{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}}
 </style>
 </head>
 <body>
+
+<div class="bg-logos">
+  <img src="logo-pro.jpg" class="floating-logo">
+  <img src="logo-pro.jpg" class="floating-logo">
+  <img src="logo-pro.jpg" class="floating-logo">
+  <img src="logo-pro.jpg" class="floating-logo">
+  <img src="logo-pro.jpg" class="floating-logo">
+</div>
 
 <div class="header">
   <img src="logo-pro.jpg">
@@ -45,7 +64,7 @@
 </div>
 
 <div id="step1" class="card">
-  <h3>1. Informations Personnelles</h3>
+  <h3><span class="emoji-anim">📝</span> Informations Personnelles</h3>
   <div class="input-group">
       <label>Civilité</label>
       <select id="c_gender">
@@ -59,17 +78,17 @@
   </div>
   <div class="input-group"><label>Téléphone Mobile</label><input type="tel" id="c_phone" placeholder="06..."></div>
   <div class="input-group"><label>Email</label><input type="email" id="c_email" placeholder="email@exemple.com"></div>
-  <div class="input-group" style="background:#f0f2f5;padding:10px;border-radius:10px;border-left:4px solid var(--primary)">
-      <label style="color:var(--primary)">Créer votre code PIN (Connexion)</label>
+  <div class="input-group" style="background:#e8f5e9;padding:12px;border-radius:12px;border:1px solid #c8e6c9">
+      <label style="color:#1b5e20">Créer votre code PIN (Connexion)</label>
       <input type="text" id="c_password" placeholder="Min 6 chiffres" maxlength="8" style="background:#fff">
   </div>
   <div class="input-group"><label>Adresse de résidence</label><input type="text" id="c_addr" placeholder="Numéro, Rue, Code Postal, Ville"></div>
-  <button class="btn-next" onclick="goToStep(2)">Suivant (Documents) ➔</button>
+  <button class="btn-next" onclick="goToStep(2)">Suivant (Documents) <span class="emoji-anim">👉</span></button>
   <center><button class="btn-back" onclick="window.location.href='index.html'">Retour connexion</button></center>
 </div>
 
 <div id="step2" class="card hidden">
-  <h3>2. Justificatifs & Véhicule</h3>
+  <h3><span class="emoji-anim">📂</span> Justificatifs & Véhicule</h3>
   <div class="grid-2">
       <div class="input-group"><label>SIREN (9 chiffres)</label><input type="tel" id="c_siren" maxlength="9"></div>
       <div class="input-group"><label>SIRET (14 chiffres)</label><input type="tel" id="c_siret" maxlength="14"></div>
@@ -87,30 +106,30 @@
   <label>Identité (CNI / Passeport / Titre séjour)</label>
   <div class="grid-2" style="margin-bottom:15px">
       <div class="upload-box" onclick="document.getElementById('file_id_front').click()">
-          <span class="upload-icon">📷</span>Recto
+          <span class="upload-icon emoji-anim">📷</span>Recto
           <input type="file" id="file_id_front" hidden accept="image/*" onchange="markDone(this)">
       </div>
       <div class="upload-box" onclick="document.getElementById('file_id_back').click()">
-          <span class="upload-icon">📷</span>Verso
+          <span class="upload-icon emoji-anim">📷</span>Verso
           <input type="file" id="file_id_back" hidden accept="image/*" onchange="markDone(this)">
       </div>
   </div>
   <label>Justificatif de Domicile (Adrs)</label>
-  <div style="margin-bottom:5px;font-size:0.8em;color:#888">EDF, Eau, Internet, ou RIB avec adresse.</div>
+  <div style="margin-bottom:5px;font-size:0.8em;color:#555">EDF, Eau, Internet, ou RIB avec adresse.</div>
   <div class="upload-box" onclick="document.getElementById('file_addr_proof').click()">
-      <span class="upload-icon">📄</span> Photo du document
+      <span class="upload-icon emoji-anim">📄</span> Photo du document
       <input type="file" id="file_addr_proof" hidden accept="image/*" onchange="markDone(this)">
   </div>
-  <button class="btn-next" onclick="goToStep(3)">Suivant (Contrat) ➔</button>
+  <button class="btn-next" onclick="goToStep(3)">Suivant (Contrat) <span class="emoji-anim">👉</span></button>
   <center><button class="btn-back" onclick="goToStep(1)">Retour</button></center>
 </div>
 
 <div id="step3" class="card hidden">
-  <h3>3. Signature du contrat</h3>
+  <h3><span class="emoji-anim">✍️</span> Signature du contrat</h3>
   <p style="font-size:0.9em;color:#666">Je certifie l'exactitude des informations fournies et accepte les conditions de partenariat AlexLivraison.</p>
   <canvas id="signature"></canvas>
-  <button class="btn-back" onclick="clearSig()" style="font-size:0.9em;color:red;margin-bottom:15px">Effacer la signature</button>
-  <button id="btn_submit" class="btn-next" onclick="submitForm()">✅ Envoyer ma candidature</button>
+  <button class="btn-back" onclick="clearSig()" style="font-size:0.9em;color:#c62828;margin-bottom:15px">Effacer la signature</button>
+  <button id="btn_submit" class="btn-next" onclick="submitForm()"><span class="emoji-anim">✅</span> Envoyer ma candidature</button>
   <div id="status_box" class="hidden"></div>
   <center><button class="btn-back" onclick="goToStep(2)">Retour</button></center>
 </div>
@@ -212,4 +231,4 @@ async function submitForm(){
 }
 </script>
 </body>
-</html> 
+</html>
