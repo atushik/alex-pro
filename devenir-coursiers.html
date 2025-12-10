@@ -38,7 +38,8 @@
   .upload-icon{font-size:24px;display:block;margin-bottom:5px}
   .btn-next{width:100%;padding:16px;background:linear-gradient(135deg,#00c853,#009624);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:800;cursor:pointer;margin-top:20px;box-shadow:0 5px 15px rgba(0,200,83,0.3);text-transform:uppercase;transition:0.3s}
   .btn-next:active{transform:scale(0.98)}
-  .btn-back{background:none;border:none;color:#666;font-weight:600;cursor:pointer;margin-top:15px;font-size:0.95em}
+  .btn-back{width:100%;padding:16px;background:linear-gradient(135deg,#546e7a,#37474f);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:800;cursor:pointer;margin-top:15px;box-shadow:0 5px 15px rgba(55,71,79,0.3);text-transform:uppercase;transition:0.3s}
+  .btn-back:active{transform:scale(0.98)}
   canvas#signature{width:100%;height:180px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;touch-action:none}
   .hidden{display:none}
   .status-msg{padding:15px;border-radius:10px;text-align:center;font-weight:bold;margin-top:15px}
@@ -84,7 +85,7 @@
   </div>
   <div class="input-group"><label>Adresse de résidence</label><input type="text" id="c_addr" placeholder="Numéro, Rue, Code Postal, Ville"></div>
   <button class="btn-next" onclick="goToStep(2)">Suivant (Documents) <span class="emoji-anim">👉</span></button>
-  <center><button class="btn-back" onclick="window.location.href='index.html'">Retour connexion</button></center>
+  <button class="btn-back" onclick="window.location.href='index.html'"><span class="emoji-anim">↩️</span> Retour Connexion</button>
 </div>
 
 <div id="step2" class="card hidden">
@@ -121,17 +122,17 @@
       <input type="file" id="file_addr_proof" hidden accept="image/*" onchange="markDone(this)">
   </div>
   <button class="btn-next" onclick="goToStep(3)">Suivant (Contrat) <span class="emoji-anim">👉</span></button>
-  <center><button class="btn-back" onclick="goToStep(1)">Retour</button></center>
+  <button class="btn-back" onclick="goToStep(1)"><span class="emoji-anim">↩️</span> Retour</button>
 </div>
 
 <div id="step3" class="card hidden">
   <h3><span class="emoji-anim">✍️</span> Signature du contrat</h3>
   <p style="font-size:0.9em;color:#666">Je certifie l'exactitude des informations fournies et accepte les conditions de partenariat AlexLivraison.</p>
   <canvas id="signature"></canvas>
-  <button class="btn-back" onclick="clearSig()" style="font-size:0.9em;color:#c62828;margin-bottom:15px">Effacer la signature</button>
+  <button class="btn-back" onclick="clearSig()" style="background:linear-gradient(135deg,#ef5350,#c62828);margin-bottom:15px;margin-top:10px">Effacer la signature</button>
   <button id="btn_submit" class="btn-next" onclick="submitForm()"><span class="emoji-anim">✅</span> Envoyer ma candidature</button>
   <div id="status_box" class="hidden"></div>
-  <center><button class="btn-back" onclick="goToStep(2)">Retour</button></center>
+  <button class="btn-back" onclick="goToStep(2)"><span class="emoji-anim">↩️</span> Retour</button>
 </div>
 
 <script>
@@ -231,4 +232,4 @@ async function submitForm(){
 }
 </script>
 </body>
-</html>
+</html> 
