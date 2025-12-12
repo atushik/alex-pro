@@ -354,6 +354,7 @@ if(!localStorage.getItem('alex_courier_logged')) window.location.href='index.htm
 
 let map, marker, isOnline=true, settingMap, courierLat=43.1242, courierLon=5.928, deliveryRadius=15, currentOrderId=null;
 let currentVehicleIcon = '🚴';
+let isHeavyVehicle = false;
 
 const VEHICLES = [
     "À pied <span class='emoji-anim'>🚶</span>", 
@@ -388,6 +389,13 @@ function initMap() {
           courierLat = pos.coords.latitude; courierLon = pos.coords.longitude;
           marker.setLatLng([courierLat, courierLon]);
           if(!currentOrderId) map.setView([courierLat, courierLon], 13);
+          
+          if(currentOrderId && isOnline) {
+             db.collection('orders').doc(currentOrderId).update({
+                 courierLat: courierLat,
+                 courierLng: courierLon
+             }).catch(e=>{});
+          }
       });
   }
   loadOrders();
@@ -404,7 +412,7 @@ function initMap() {
 
 function loadVehicleList(){
     const list = document.getElementById('vehicleList');
-    VEHICLES.forEach(v => {
+    VEHICLES.forEach((v, index) => {
         const div = document.createElement('div');
         div.className = 'menu-item';
         div.innerHTML = `<span>${v}</span><span class="menu-arrow">⚪</span>`;
@@ -426,7 +434,9 @@ function loadVehicleList(){
                     }));
                 }
              }
+             isHeavyVehicle = (index >= 8);
              alert('Véhicule sélectionné !');
+             if(isOnline) loadOrders();
         };
         list.appendChild(div);
     });
@@ -455,6 +465,8 @@ function loadOrders() {
             return;
         }
         snap.forEach(doc => {
+            if(isHeavyVehicle) return;
+
             const o = doc.data();
             const card = document.createElement('div');
             card.className = 'order-card';
@@ -523,8 +535,10 @@ function checkActiveOrder() {
     db.collection('orders').where('courierId', '==', uid).where('status', 'in', ['accepted', 'picked_up']).onSnapshot(snap => {
         if(!snap.empty) {
             const doc = snap.docs[0];
+            currentOrderId = doc.id;
             renderActiveUI(doc.id, doc.data());
         } else {
+            currentOrderId = null;
             document.getElementById('activeOrderContent').innerHTML = '<div style="padding:40px;text-align:center"><span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">🤷‍♂️</span><h3 style="color:#fff">Aucune livraison</h3></div>';
         }
     });
@@ -557,6 +571,7 @@ function finishOrder(id){
     const w = parseFloat(localStorage.getItem('alex_wallet')||0) + 5.00;
     localStorage.setItem('alex_wallet', w.toFixed(2));
     document.getElementById('walletAmount').innerText = w.toFixed(2) + " €";
+    currentOrderId = null;
     alert("Bravo ! Course terminée.");
     closeAllPages();
 }
