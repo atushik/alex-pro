@@ -73,7 +73,7 @@
     <button class="btn-main btn-secondary" onclick="window.location.href='devenir-coursiers.html'"><span class="emoji-anim">📝</span> CRÉER UN COMPTE</button>
     
     <button id="pwaInstallBtn" class="btn-main btn-install">
-        <span class="emoji-anim">📲</span> INSTALLER L'APP
+        <span class="emoji-anim">📲</span> INSTALLER APPLICATION
     </button>
   </div>
 
@@ -97,7 +97,7 @@ const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
 if (isInStandaloneMode) {
-    installBtn.style.display = 'none';
+    localStorage.setItem('alex_pwa_installed', 'true'); installBtn.style.display = 'none';
 } else {
     if (isIos) {
         installBtn.addEventListener('click', () => {
@@ -113,7 +113,7 @@ if (isInStandaloneMode) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        installBtn.style.display = 'none';
+                        localStorage.setItem('alex_pwa_installed', 'true'); installBtn.style.display = 'none';
                     }
                     deferredPrompt = null;
                 });
