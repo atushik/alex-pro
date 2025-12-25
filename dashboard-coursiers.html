@@ -98,36 +98,36 @@
         <span id="statusText">En ligne</span>
     </div>
     <div class="settings-btn" onclick="openPage('settings')">
-        <span class="emoji-anim">вљ™пёЏ</span> RГ©glages
+        <span class="emoji-anim">⚙️</span> Réglages
     </div>
 </div>
 
 <div id="orders-container" class="orders-carousel">
     <div class="empty-state">
-        <span class="emoji-anim" style="font-size:2em">рџ“Ў</span><br>
+        <span class="emoji-anim" style="font-size:2em">📡</span><br>
         Recherche de courses...
     </div>
 </div>
 
 <div class="nav-bar">
   <div class="nav-item active" onclick="closeAllPages()">
-    <div class="nav-icon emoji-anim">вљЎ</div>
+    <div class="nav-icon emoji-anim">⚡</div>
     <div>Accueil</div>
   </div>
   <div class="nav-item" onclick="openPage('encours')">
-    <div class="nav-icon emoji-anim">рџЋ’</div>
+    <div class="nav-icon emoji-anim">🎒</div>
     <div>En cours</div>
   </div>
   <div class="nav-item" onclick="openPage('wallet')">
-    <div class="nav-icon emoji-anim">рџ’°</div>
+    <div class="nav-icon emoji-anim">💰</div>
     <div>Gains</div>
   </div>
   <div class="nav-item" onclick="openPage('aide')">
-    <div class="nav-icon emoji-anim">рџ’¬</div>
+    <div class="nav-icon emoji-anim">💬</div>
     <div>Aide</div>
   </div>
   <div class="nav-item" onclick="openPage('profile')">
-    <div class="nav-icon emoji-anim">рџ‘¤</div>
+    <div class="nav-icon emoji-anim">👤</div>
     <div>Compte</div>
   </div>
 </div>
@@ -141,21 +141,21 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="closeAllPages()">вЂ№</button>
-        <div class="page-title">RГ©glages</div>
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Réglages</div>
     </div>
     <div class="page-content">
         <div class="menu-list">
              <div class="menu-item" onclick="openRadiusSettings()">
-                <span><span class="emoji-anim">рџ—єпёЏ</span> Type de carte (Distance)</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span><span class="emoji-anim">🗺️</span> Type de carte (Distance)</span>
+                <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item">
-                <span><span class="emoji-anim">рџ””</span> Notifications</span>
+                <span><span class="emoji-anim">🔔</span> Notifications</span>
                 <input type="checkbox" checked>
             </div>
         </div>
-        
+
         <div id="radius-box" class="range-box" style="display:none">
              <h3>Rayon d'action</h3>
              <div class="map-preview-box" id="settingMap"></div>
@@ -175,32 +175,32 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="closeAllPages()">вЂ№</button>
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
         <div class="page-title">Mon Compte</div>
     </div>
     <div class="page-content">
         <div class="profile-header">
             <div class="profile-pic" onclick="document.getElementById('avatarInput').click()">
-                <span id="avatarEmoji" class="emoji-anim">рџ“ё</span>
+                <span id="avatarEmoji" class="emoji-anim">📸</span>
                 <img id="avatarImg" src="" style="display:none">
             </div>
             <input type="file" id="avatarInput" hidden accept="image/*" onchange="previewAvatar(this)">
             <h2 id="profileName" style="margin:5px 0;color:#fff">Chargement...</h2>
-            <p style="color:#aaa;margin:0">Coursier CertifiГ©</p>
+            <p style="color:#aaa;margin:0">Coursier Certifié</p>
         </div>
 
         <div class="menu-list">
             <div class="menu-item" onclick="openPage('documents')">
-                <span><span class="emoji-anim">рџ“‚</span> Mes documents</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span><span class="emoji-anim">📂</span> Mes documents</span>
+                <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item" onclick="openPage('transport')">
-                <span><span class="emoji-anim">рџ›µ</span> Mon vГ©hicule</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span><span class="emoji-anim">🚲</span> Mon véhicule</span>
+                <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item" style="color:#ff4d4d" onclick="logout()">
-                <span><span class="emoji-anim">рџ”ґ</span> DГ©connexion</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span><span class="emoji-anim">🔴</span> Déconnexion</span>
+                <span class="menu-arrow">❯</span>
             </div>
         </div>
     </div>
@@ -215,8 +215,8 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="openPage('profile')">вЂ№</button>
-        <div class="page-title">Mon VГ©hicule</div>
+        <button class="btn-back-page" onclick="openPage('profile')">‹</button>
+        <div class="page-title">Mon Véhicule</div>
     </div>
     <div class="page-content">
         <div class="menu-list" id="vehicleList"></div>
@@ -232,32 +232,32 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="openPage('profile')">вЂ№</button>
+        <button class="btn-back-page" onclick="openPage('profile')">‹</button>
         <div class="page-title">Gestion Documents</div>
     </div>
     <div class="page-content">
-        <h3 style="margin-left:10px;color:#fff">Mes piГЁces justificatives</h3>
+        <h3 style="margin-left:10px;color:#fff">Mes pièces justificatives</h3>
         <div class="doc-grid">
             <div class="doc-card">
-                <div class="doc-card-btn" onclick="alert('Supprimer ?')">рџ—‘пёЏ</div>
-                <div class="emoji-anim" style="font-size:2em">рџ†”</div>
-                <div style="font-weight:bold;font-size:0.9em">IdentitГ©</div>
-                <span style="background:rgba(46,125,50,0.5);color:#81c784;padding:2px 6px;border-radius:4px;font-size:0.7em">ValidГ©</span>
+                <div class="doc-card-btn" onclick="alert('Supprimer ?')">🗑️</div>
+                <div class="emoji-anim" style="font-size:2em">🆔</div>
+                <div style="font-weight:bold;font-size:0.9em">Identité</div>
+                <span style="background:rgba(46,125,50,0.5);color:#81c784;padding:2px 6px;border-radius:4px;font-size:0.7em">Validé</span>
             </div>
             <div class="doc-card" onclick="alert('Modifier le RIB')">
-                <div class="doc-card-btn">вњЏпёЏ</div>
-                <div class="emoji-anim" style="font-size:2em">рџЏ¦</div>
+                <div class="doc-card-btn">✏️</div>
+                <div class="emoji-anim" style="font-size:2em">🏦</div>
                 <div style="font-weight:bold;font-size:0.9em">RIB / IBAN</div>
-                <span style="background:rgba(239,108,0,0.5);color:#ffcc80;padding:2px 6px;border-radius:4px;font-size:0.7em">ГЂ jour</span>
+                <span style="background:rgba(239,108,0,0.5);color:#ffcc80;padding:2px 6px;border-radius:4px;font-size:0.7em">À jour</span>
             </div>
             <div class="doc-card">
-                 <div class="doc-card-btn">рџ‘ЃпёЏ</div>
-                <div class="emoji-anim" style="font-size:2em">рџ“„</div>
+                 <div class="doc-card-btn">👁️</div>
+                <div class="emoji-anim" style="font-size:2em">📑</div>
                 <div style="font-weight:bold;font-size:0.9em">Contrat</div>
-                <span style="background:rgba(46,125,50,0.5);color:#81c784;padding:2px 6px;border-radius:4px;font-size:0.7em">SignГ©</span>
+                <span style="background:rgba(46,125,50,0.5);color:#81c784;padding:2px 6px;border-radius:4px;font-size:0.7em">Signé</span>
             </div>
              <div class="doc-card" style="border:2px dashed #555;background:transparent" onclick="alert('Ajouter un document')">
-                <div style="font-size:2em">вћ•</div>
+                <div style="font-size:2em">➕</div>
                 <div style="font-weight:bold;color:#888">Ajouter</div>
             </div>
         </div>
@@ -273,22 +273,22 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="closeAllPages()">вЂ№</button>
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
         <div class="page-title">Aide</div>
     </div>
     <div class="page-content">
         <div class="menu-list">
             <div class="menu-item" onclick="location.href='https://wa.me/33677171188'">
-                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">рџ’¬</span> Support WhatsApp</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">💬</span> Support WhatsApp</span>
+                <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item" onclick="location.href='tel:+33677171188'">
-                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">рџ“ћ</span> Appeler l'assistance</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">📞</span> Appeler l'assistance</span>
+                <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item">
-                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">вќ“</span> FAQ</span>
-                <span class="menu-arrow">вќЇ</span>
+                <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">❓</span> FAQ</span>
+                <span class="menu-arrow">❯</span>
             </div>
         </div>
     </div>
@@ -303,16 +303,31 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="closeAllPages()">вЂ№</button>
-        <div class="page-title">Ma Cagnotte</div>
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
+        <div class="page-title">Mes Gains</div>
     </div>
-    <div class="page-content">
-        <div style="padding:20px">
-            <div style="background:linear-gradient(45deg,#00c853,#009624);padding:30px;border-radius:20px;color:#fff;text-align:center;box-shadow:0 10px 30px rgba(0,200,83,0.3)">
-                <div style="opacity:0.9">Solde disponible</div>
-                <div style="font-size:2.5em;font-weight:900;margin:10px 0" id="walletAmount">0,00 в‚¬</div>
+    <div class="page-content" style="text-align:center">
+        <div style="background:rgba(255,255,255,0.05);padding:30px;border-radius:25px;border:1px solid rgba(255,255,255,0.1);margin-bottom:20px">
+            <div style="color:#aaa;font-weight:600;margin-bottom:10px">Solde actuel</div>
+            <div style="font-size:3em;font-weight:900;color:var(--primary)" id="walletAmount">0.00 €</div>
+            <button class="btn-save" style="margin-top:20px">Demander un virement</button>
+        </div>
+        <h3 style="text-align:left;color:#fff;margin-left:10px">Historique</h3>
+        <div class="menu-list">
+            <div class="menu-item">
+                <div>
+                    <div style="font-weight:bold">Course #1234</div>
+                    <div style="font-size:0.8em;color:#888">Aujourd'hui, 14:30</div>
+                </div>
+                <div style="color:var(--primary);font-weight:bold">+5.00 €</div>
             </div>
-            <button class="btn-save" style="background:#333;margin-top:20px;box-shadow:none;border:1px solid #555">рџЏ¦ Retirer mes fonds</button>
+            <div class="menu-item">
+                <div>
+                    <div style="font-weight:bold">Course #1230</div>
+                    <div style="font-size:0.8em;color:#888">Hier, 18:15</div>
+                </div>
+                <div style="color:var(--primary);font-weight:bold">+8.50 €</div>
+            </div>
         </div>
     </div>
 </div>
@@ -326,165 +341,137 @@
         <img src="logo-pro.jpg" class="floating-logo">
     </div>
     <div class="page-header">
-        <button class="btn-back-page" onclick="closeAllPages()">вЂ№</button>
+        <button class="btn-back-page" onclick="closeAllPages()">‹</button>
         <div class="page-title">Livraison en cours</div>
     </div>
     <div class="page-content" id="activeOrderContent">
-         <div style="padding:40px;text-align:center">
-            <span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">рџ¤·вЂЌв™‚пёЏ</span>
-            <h3 style="color:#fff">Aucune livraison</h3>
+        <div style="padding:40px;text-align:center">
+            <span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">🤷‍♂️</span>
+            <h3 style="color:#fff">Aucune livraison active</h3>
         </div>
     </div>
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js')
-            .then(reg => console.log('SW ok'))
-            .catch(err => console.log('SW fail'));
-    });
-}
-
 const firebaseConfig={apiKey:"AIzaSyAWagPwv5Skh_EHfdcnFTYeG-xltRM7yPc",authDomain:"alex-livraison.firebaseapp.com",projectId:"alex-livraison",storageBucket:"alex-livraison.firebasestorage.app",messagingSenderId:"937475497279",appId:"1:937475497279:web:62dc9eba8e77a5113ec78a"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-if(!localStorage.getItem('alex_courier_logged')) window.location.href='index.html';
-
-let map, marker, isOnline=true, settingMap, courierLat=43.1242, courierLon=5.928, deliveryRadius=15, currentOrderId=null;
-let currentVehicleIcon = 'рџљґ';
-let isHeavyVehicle = false;
+let map, marker, settingMap;
+let isOnline = true;
+let deliveryRadius = 15;
+let courierLat = 43.2965;
+let courierLon = 5.3698;
+let currentOrderId = null;
 
 const VEHICLES = [
-    "ГЂ pied <span class='emoji-anim'>рџљ¶</span>", 
-    "Trottinette <span class='emoji-anim'>рџ›ґ</span>", 
-    "VГ©lo <span class='emoji-anim'>рџљІ</span>", 
-    "VГ©lo Г‰lectrique <span class='emoji-anim'>вљЎрџљІ</span>",
-    "Scooter <span class='emoji-anim'>рџ›µ</span>", 
-    "Scooter Г‰lectrique <span class='emoji-anim'>вљЎрџ›µ</span>", 
-    "Voiture <span class='emoji-anim'>рџљ—</span>", 
-    "Voiture Г‰lectrique <span class='emoji-anim'>вљЎрџљ—</span>",
-    "Camionnette <span class='emoji-anim'>рџљђ</span>", 
-    "Camionnette Г‰lec. <span class='emoji-anim'>вљЎрџљђ</span>", 
-    "Camion <span class='emoji-anim'>рџљ›</span>", 
-    "Camion Г‰lectrique <span class='emoji-anim'>вљЎрџљ›</span>"
+    {id:'velo', name:'Vélo', icon:'🚲'},
+    {id:'scooter', name:'Scooter', icon:'🛵'},
+    {id:'voiture', name:'Voiture', icon:'🚗'},
+    {id:'camion', name:'Camion', icon:'🚚'}
 ];
+let currentVehicle = localStorage.getItem('alex_vehicle') || 'velo';
+let currentVehicleIcon = '🚲';
 
 function initMap() {
-  map = L.map('map-layer', {zoomControl: false, attributionControl: false}).setView([courierLat, courierLon], 13);
-  L.control.zoom({position:'topleft'}).addTo(map);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-  
-  const icon = L.divIcon({
-      className: 'custom-marker-container',
-      html: `<span class="marker-anim">${currentVehicleIcon}</span>`,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20]
-  });
-  marker = L.marker([courierLat, courierLon], {icon: icon}).addTo(map);
-  
-  if(navigator.geolocation) {
-      navigator.geolocation.watchPosition(pos => {
-          courierLat = pos.coords.latitude; courierLon = pos.coords.longitude;
-          marker.setLatLng([courierLat, courierLon]);
-          if(!currentOrderId) map.setView([courierLat, courierLon], 13);
-          
-          if(currentOrderId && isOnline) {
-             db.collection('orders').doc(currentOrderId).update({
-                 courierLat: courierLat,
-                 courierLng: courierLon
-             }).catch(e=>{});
-          }
-      });
-  }
-  loadOrders();
-  loadVehicleList();
-  
-  const savedAvatar = localStorage.getItem('alex_avatar');
-  if(savedAvatar) {
-      document.getElementById('avatarImg').src = savedAvatar;
-      document.getElementById('avatarImg').style.display = 'block';
-  }
-  document.getElementById('profileName').innerText = localStorage.getItem('alex_courier_name') || 'Livreur';
-  checkActiveOrder();
-}
+    if(!localStorage.getItem('alex_courier_logged')) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    document.getElementById('profileName').innerText = localStorage.getItem('alex_courier_name') || 'Coursier';
+    document.getElementById('walletAmount').innerText = (localStorage.getItem('alex_wallet') || '0.00') + " €";
+    
+    const savedAvatar = localStorage.getItem('alex_avatar');
+    if(savedAvatar) {
+        document.getElementById('avatarImg').src = savedAvatar;
+        document.getElementById('avatarImg').style.display = 'block';
+        document.getElementById('avatarEmoji').style.display = 'none';
+    }
 
-function loadVehicleList(){
-    const list = document.getElementById('vehicleList');
-    VEHICLES.forEach((v, index) => {
-        const div = document.createElement('div');
-        div.className = 'menu-item';
-        div.innerHTML = `<span>${v}</span><span class="menu-arrow">вљЄ</span>`;
-        div.onclick = () => {
-             document.querySelectorAll('#vehicleList .menu-arrow').forEach(e=>e.innerText='вљЄ');
-             div.querySelector('.menu-arrow').innerText='вњ…';
-             
-             const parser = new DOMParser();
-             const htmlDoc = parser.parseFromString(v, 'text/html');
-             const emojiSpan = htmlDoc.querySelector('.emoji-anim');
-             if(emojiSpan) {
-                currentVehicleIcon = emojiSpan.innerText;
-                if(marker && map) {
-                     marker.setIcon(L.divIcon({
-                        className: 'custom-marker-container',
-                        html: `<span class="marker-anim">${currentVehicleIcon}</span>`,
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20]
-                    }));
-                }
-             }
-             isHeavyVehicle = (index >= 8);
-             alert('VГ©hicule sГ©lectionnГ© !');
-             if(isOnline) loadOrders();
-        };
-        list.appendChild(div);
+    renderVehicleList();
+    updateVehicleIcon();
+
+    map = L.map('map-layer', {zoomControl:false}).setView([courierLat, courierLon], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    const iconHtml = `<div class="marker-anim">${currentVehicleIcon}</div>`;
+    const customIcon = L.divIcon({
+        html: iconHtml,
+        className: 'leaflet-div-icon',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
     });
+
+    marker = L.marker([courierLat, courierLon], {icon: customIcon}).addTo(map);
+
+    if(navigator.geolocation) {
+        navigator.geolocation.watchPosition(pos => {
+            courierLat = pos.coords.latitude;
+            courierLon = pos.coords.longitude;
+            marker.setLatLng([courierLat, courierLon]);
+            map.setView([courierLat, courierLon]);
+        }, err => console.log(err), {enableHighAccuracy:true});
+    }
+    
+    checkActiveOrder();
+    loadAvailableOrders();
 }
 
 function toggleStatus() {
     isOnline = !isOnline;
     const dot = document.getElementById('statusDot');
     const txt = document.getElementById('statusText');
-    if (isOnline) {
-        dot.classList.remove('off'); txt.innerText = "En ligne"; 
-        loadOrders();
+    if(isOnline) {
+        dot.classList.remove('off');
+        txt.innerText = "En ligne";
+        document.getElementById('map-layer').style.filter = "grayscale(0%)";
     } else {
-        dot.classList.add('off'); txt.innerText = "Hors ligne";
-        document.getElementById('orders-container').innerHTML = '<div class="empty-state">Vous ГЄtes hors ligne</div>';
+        dot.classList.add('off');
+        txt.innerText = "Hors ligne";
+        document.getElementById('map-layer').style.filter = "grayscale(100%)";
     }
 }
 
-function loadOrders() {
-    if(!isOnline) return;
-    db.collection('orders').where('status', '==', 'ready_for_pickup').onSnapshot(snap => {
-        const container = document.getElementById('orders-container');
-        container.innerHTML = '';
-        if(snap.empty) {
-            container.innerHTML = '<div class="empty-state"><span class="emoji-anim">рџ“Ў</span><br>En attente de commandes prГЄtes...</div>';
-            return;
-        }
-        snap.forEach(doc => {
-            if(isHeavyVehicle) return;
-
-            const o = doc.data();
-            const card = document.createElement('div');
-            card.className = 'order-card';
-            card.innerHTML = `
-                <div class="order-head">
-                    <div class="shop-name"><span class="emoji-anim">рџЏЄ</span> ${o.shopName||'Resto'}</div>
-                    <div class="order-price">${o.price} в‚¬</div>
-                </div>
-                <div class="big-info">
-                    <div class="info-tag"><span class="emoji-anim">рџ“Ќ</span> <span>${o.from}</span></div>
-                    <div class="arrow-down">в¬‡</div>
-                    <div class="info-tag"><span class="emoji-anim">рџЏЃ</span> <span>${o.to}</span></div>
-                </div>
-                <button class="btn-accept" onclick="acceptOrder('${doc.id}')">ACCEPTER</button>
-            `;
-            container.appendChild(card);
-        });
+function renderVehicleList() {
+    const list = document.getElementById('vehicleList');
+    list.innerHTML = '';
+    VEHICLES.forEach(v => {
+        const isSel = v.id === currentVehicle;
+        list.innerHTML += `
+        <div class="menu-item" onclick="setVehicle('${v.id}')">
+            <span style="display:flex;align-items:center;gap:10px">
+                <span class="emoji-anim">${v.icon}</span> ${v.name}
+            </span>
+            ${isSel ? '<span style="color:var(--primary)">✔</span>' : ''}
+        </div>`;
     });
+}
+
+function setVehicle(id) {
+    currentVehicle = id;
+    localStorage.setItem('alex_vehicle', id);
+    renderVehicleList();
+    updateVehicleIcon();
+    
+    // Update marker
+    const iconHtml = `<div class="marker-anim">${currentVehicleIcon}</div>`;
+    const customIcon = L.divIcon({
+        html: iconHtml,
+        className: 'leaflet-div-icon',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+    marker.setIcon(customIcon);
+}
+
+function updateVehicleIcon() {
+    const v = VEHICLES.find(x => x.id === currentVehicle);
+    currentVehicleIcon = v ? v.icon : '🚲';
 }
 
 function openPage(id) {
@@ -523,6 +510,61 @@ function previewAvatar(input) {
     }
 }
 
+// --- COURIER DASHBOARD LOGIC ---
+const VEHICLE_CAPACITY = {
+    'velo': ['Petit (S)'],
+    'scooter': ['Petit (S)', 'Moyen (M)'],
+    'voiture': ['Petit (S)', 'Moyen (M)', 'Grand (L)'],
+    'camion': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)']
+};
+
+function loadAvailableOrders() {
+    const ordersList = document.getElementById('orders-container'); 
+    if(!ordersList) return; 
+
+    db.collection('orders')
+      .where('status', 'in', ['pending', 'pending_payment', 'paid']) 
+      .where('deliveryType', '==', 'Livraison')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+          ordersList.innerHTML = ''; 
+          if (snapshot.empty) {
+              ordersList.innerHTML = '<div class="empty-state"><span class="emoji-anim" style="font-size:2em">📡</span><br>Aucune commande disponible.</div>';
+              return;
+          }
+          snapshot.forEach(doc => {
+              const order = doc.data();
+              order.id = doc.id;
+              const orderSize = order.parcelSize || 'Petit (S)';
+              const allowedSizes = VEHICLE_CAPACITY[currentVehicle] || VEHICLE_CAPACITY['velo'];
+              
+              // Filter logic
+              if (!allowedSizes.includes(orderSize)) return; 
+              
+              renderOrderCard(order, ordersList);
+          });
+      });
+}
+
+function renderOrderCard(order, container) {
+    const html = `
+        <div class="order-card">
+            <div class="order-head">
+                <span class="shop-name"><span class="emoji-anim">🏪</span> ${order.shopName}</span>
+                <span class="order-price">${order.totalPrice}€</span>
+            </div>
+            <div class="big-info">
+                <div class="info-tag"><span class="emoji-anim">📦</span> Volume: <strong style="color:#fff;">${order.parcelSize || 'Petit (S)'}</strong></div>
+                <div class="info-tag"><span class="emoji-anim">📍</span> De: ${order.from}</div>
+                <div class="info-tag"><span class="emoji-anim">🏁</span> Vers: ${order.to}</div>
+                <div class="info-tag"><span class="emoji-anim">🕒</span> Pour: ${order.deliveryTime}</div>
+            </div>
+            <button onclick="acceptOrder('${order.id}')" class="btn-accept">Accepter la course</button>
+        </div>
+    `;
+    container.innerHTML += html;
+}
+
 async function acceptOrder(id) {
     await db.collection('orders').doc(id).update({status: 'accepted', courierId: localStorage.getItem('alex_courier_id')});
     currentOrderId = id;
@@ -539,7 +581,7 @@ function checkActiveOrder() {
             renderActiveUI(doc.id, doc.data());
         } else {
             currentOrderId = null;
-            document.getElementById('activeOrderContent').innerHTML = '<div style="padding:40px;text-align:center"><span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">рџ¤·вЂЌв™‚пёЏ</span><h3 style="color:#fff">Aucune livraison</h3></div>';
+            document.getElementById('activeOrderContent').innerHTML = '<div style="padding:40px;text-align:center"><span class="emoji-anim" style="font-size:5em;display:block;margin-bottom:20px">🤷‍♂️</span><h3 style="color:#fff">Aucune livraison</h3></div>';
         }
     });
 }
@@ -553,14 +595,14 @@ function renderActiveUI(id, data){
                 <div class="emoji-anim" style="font-size:2.5em">${currentVehicleIcon}</div>
             </div>
             <div class="step-card ${!isPicked?'active':''}">
-                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">рџ“Ќ</span> Restaurant</div>
+                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">📍</span> Restaurant</div>
                 <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.from}</div>
-                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="db.collection('orders').doc('${id}').update({status:'picked_up'})">рџ“¦ Colis RГ©cupГ©rГ©</button>` : ''}
+                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="db.collection('orders').doc('${id}').update({status:'picked_up'})">📦 Colis Récupéré</button>` : ''}
             </div>
             <div class="step-card ${isPicked?'active':''}">
-                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">рџЏЃ</span> Client</div>
+                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">🏁</span> Client</div>
                 <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.to}</div>
-                ${isPicked ? `<button class="btn-action btn-deliver" onclick="finishOrder('${id}')">вњ… LivrГ©</button>` : ''}
+                ${isPicked ? `<button class="btn-action btn-deliver" onclick="finishOrder('${id}')">✅ Livré</button>` : ''}
             </div>
         </div>
     `;
@@ -570,78 +612,20 @@ function finishOrder(id){
     db.collection('orders').doc(id).update({status:'delivered'});
     const w = parseFloat(localStorage.getItem('alex_wallet')||0) + 5.00;
     localStorage.setItem('alex_wallet', w.toFixed(2));
-    document.getElementById('walletAmount').innerText = w.toFixed(2) + " в‚¬";
+    document.getElementById('walletAmount').innerText = w.toFixed(2) + " €";
     currentOrderId = null;
-    alert("Bravo ! Course terminГ©e.");
+    alert("Bravo ! Course terminée.");
     closeAllPages();
 }
 
 function logout() {
-    if(confirm("DГ©connexion ?")) {
+    if(confirm("Déconnexion ?")) {
         localStorage.removeItem('alex_courier_logged');
         window.location.href = 'index.html';
     }
 }
 
-// --- COURIER DASHBOARD LOGIC ---
-const VEHICLE_CAPACITY = {
-    'velo': ['Petit (S)'],
-    'scooter': ['Petit (S)', 'Moyen (M)'],
-    'voiture': ['Petit (S)', 'Moyen (M)', 'Grand (L)'],
-    'camion': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)']
-};
-const currentVehicle = localStorage.getItem('courier_vehicle') || 'velo'; 
-
-function loadAvailableOrders() {
-    const db = firebase.firestore();
-    const ordersList = document.getElementById('orders-container'); 
-    if(!ordersList) return; 
-
-    db.collection('orders')
-      .where('status', 'in', ['pending', 'pending_payment', 'paid']) 
-      .where('deliveryType', '==', 'Livraison')
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(snapshot => {
-          ordersList.innerHTML = ''; 
-          if (snapshot.empty) {
-              ordersList.innerHTML = '<div class="empty-state"><span class="emoji-anim" style="font-size:2em"></span><br>Aucune commande disponible.</div>';
-              return;
-          }
-          snapshot.forEach(doc => {
-              const order = doc.data();
-              order.id = doc.id;
-              const orderSize = order.parcelSize || 'Petit (S)';
-              const allowedSizes = VEHICLE_CAPACITY[currentVehicle] || VEHICLE_CAPACITY['velo'];
-              if (!allowedSizes.includes(orderSize)) return; 
-              renderOrderCard(order, ordersList);
-          });
-      });
-}
-
-function renderOrderCard(order, container) {
-    const html = \
-        <div class="order-card">
-            <div class="order-head">
-                <span class="shop-name"><span class="emoji-anim"></span> \</span>
-                <span class="order-price">\€</span>
-            </div>
-            <div class="big-info">
-                <div class="info-tag"><span class="emoji-anim"></span> Volume: <strong style="color:#fff;">\</strong></div>
-                <div class="info-tag"><span class="emoji-anim"></span> De: \</div>
-                <div class="info-tag"><span class="emoji-anim"></span> Vers: \</div>
-                <div class="info-tag"><span class="emoji-anim"></span> Pour: \</div>
-            </div>
-            <button onclick="acceptOrder('\')" class="btn-accept">Accepter la course</button>
-        </div>
-    \;
-    container.innerHTML += html;
-}
-
-window.onload = function() {
-    initMap();
-    loadAvailableOrders();
-};
+window.onload = initMap;
 </script>
 </body>
-</html> 
-
+</html>
