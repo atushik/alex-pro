@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
 <title>AlexLivraison Pro</title>
 <meta name="theme-color" content="#052e16">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="logo-pro.jpg">
-<link rel="manifest" href="./manifest-pro.json?v=5">
+<link rel="manifest" href="./manifest-pro.json?v=6">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -627,8 +630,35 @@ async function requestNotificationPermission() {
 async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.register('sw-courier.js');
+            // Unregister old service workers first
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let reg of registrations) {
+                await reg.unregister();
+                console.log('Old SW unregistered');
+            }
+            
+            // Register new one with cache busting
+            const registration = await navigator.serviceWorker.register('sw-courier.js?v=' + Date.now());
             console.log('ServiceWorker registered:', registration.scope);
+            
+            // Listen for SW messages
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'RELOAD') {
+                    console.log('SW requested reload');
+                    window.location.reload(true);
+                }
+            });
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+                console.log('New SW found, will reload...');
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'activated') {
+                        window.location.reload(true);
+                    }
+                });
+            });
         } catch(e) {
             console.log('ServiceWorker registration failed:', e);
         }

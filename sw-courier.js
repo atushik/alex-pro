@@ -1,103 +1,77 @@
-﻿// Service Worker for AlexLivraison Pro Courier App
-const CACHE_NAME = 'alex-pro-v2';
-const urlsToCache = [
-    '/',
-    '/dashboard-coursiers.html',
-    '/index.html',
-    '/logo-pro.jpg'
-];
+﻿// Service Worker for AlexLivraison Pro - v3
+const CACHE_VERSION = 'alex-pro-v3-' + Date.now();
 
-// Install event
+// Install - skip waiting immediately
 self.addEventListener('install', event => {
-    console.log('Service Worker installing...');
+    console.log('SW: Installing new version...');
     self.skipWaiting();
+});
+
+// Activate - claim all clients and clear old caches
+self.addEventListener('activate', event => {
+    console.log('SW: Activating...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(urlsToCache).catch(e => console.log('Cache error:', e));
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cache => {
+                    console.log('SW: Deleting old cache:', cache);
+                    return caches.delete(cache);
+                })
+            );
+        }).then(() => {
+            console.log('SW: Claiming clients...');
+            return self.clients.claim();
+        }).then(() => {
+            // Force reload all open pages
+            return self.clients.matchAll({ type: 'window' }).then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({ type: 'RELOAD' });
+                });
+            });
         })
     );
 });
 
-// Activate event - clean old caches
-self.addEventListener('activate', event => {
-    console.log('Service Worker activating...');
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.filter(name => name !== CACHE_NAME)
-                    .map(name => caches.delete(name))
-            );
-        }).then(() => self.clients.claim())
-    );
-});
-
-// Fetch event - network first, then cache
+// Fetch - ALWAYS network first, no cache for HTML
 self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+    
+    // Always fetch HTML from network
+    if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match(event.request))
+        );
+        return;
+    }
+    
+    // For other resources, network first
     event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                // Clone and cache new responses
-                if (response.status === 200) {
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, responseClone);
-                    });
-                }
-                return response;
-            })
-            .catch(() => caches.match(event.request))
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
-// Push notification event
+// Push notification
 self.addEventListener('push', event => {
-    console.log('Push received:', event);
+    console.log('SW: Push received');
     const data = event.data ? event.data.json() : {};
     
-    const title = data.title || 'Nouvelle Course!';
-    const options = {
-        body: data.body || 'Une nouvelle livraison est disponible',
-        icon: 'logo-pro.jpg',
-        badge: 'logo-pro.jpg',
-        vibrate: [200, 100, 200, 100, 200],
-        tag: 'new-order',
-        renotify: true,
-        requireInteraction: true,
-        actions: [
-            { action: 'open', title: 'Voir' },
-            { action: 'close', title: 'Fermer' }
-        ]
-    };
-    
     event.waitUntil(
-        self.registration.showNotification(title, options)
+        self.registration.showNotification(data.title || 'Nouvelle Course!', {
+            body: data.body || 'Une nouvelle livraison disponible',
+            icon: 'logo-pro.jpg',
+            badge: 'logo-pro.jpg',
+            vibrate: [200, 100, 200, 100, 200],
+            tag: 'new-order',
+            renotify: true,
+            requireInteraction: true
+        })
     );
 });
 
-// Notification click event
+// Notification click
 self.addEventListener('notificationclick', event => {
-    console.log('Notification clicked:', event.action);
     event.notification.close();
-    
-    if (event.action === 'open' || !event.action) {
-        event.waitUntil(
-            clients.matchAll({ type: 'window', includeUncontrolled: true })
-                .then(clientList => {
-                    // Focus existing window or open new
-                    for (const client of clientList) {
-                        if (client.url.includes('dashboard-coursiers') && 'focus' in client) {
-                            return client.focus();
-                        }
-                    }
-                    return clients.openWindow('/dashboard-coursiers.html');
-                })
-        );
-    }
-});
-
-// Background sync for offline orders
-self.addEventListener('sync', event => {
-    if (event.tag === 'sync-orders') {
-        console.log('Background sync triggered');
-    }
+    event.waitUntil(
+        clients.openWindow('/dashboard-coursiers.html')
+    );
 });
