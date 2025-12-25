@@ -991,6 +991,7 @@ function markPickedUp(orderId) {
 
 function showConfirmationCode(orderId, courierFee) {
     const modal = document.createElement('div');
+    modal.id = 'codeModal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
     modal.innerHTML = `
         <div style="background:#1a1a1a;border-radius:20px;padding:30px;width:100%;max-width:320px;text-align:center">
@@ -1000,12 +1001,17 @@ function showConfirmationCode(orderId, courierFee) {
             <input type="text" id="confirmCode" maxlength="4" pattern="[0-9]*" inputmode="numeric" 
                    style="width:100%;padding:20px;font-size:2em;text-align:center;letter-spacing:15px;border:2px solid #333;border-radius:15px;background:#222;color:#fff;outline:none"
                    placeholder="____">
+            <div id="codeError" style="color:#ff5252;font-size:0.85em;margin-top:10px;display:none"></div>
             <button onclick="verifyCode('${orderId}', ${courierFee})" 
                     style="width:100%;padding:15px;margin:20px 0 10px 0;background:linear-gradient(135deg,#00c853,#009624);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer">
                 ✅ Valider la livraison
             </button>
-            <button onclick="this.closest('div').parentElement.remove()" 
-                    style="width:100%;padding:12px;background:#333;color:#fff;border:none;border-radius:12px;cursor:pointer">
+            <button onclick="showCodeProblem('${orderId}', ${courierFee})" 
+                    style="width:100%;padding:12px;background:#ff6f00;color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:0.9em">
+                ⚠️ Problème avec le code
+            </button>
+            <button onclick="document.getElementById('codeModal').remove()" 
+                    style="width:100%;padding:12px;margin-top:10px;background:#333;color:#fff;border:none;border-radius:12px;cursor:pointer">
                 Annuler
             </button>
         </div>
@@ -1014,10 +1020,60 @@ function showConfirmationCode(orderId, courierFee) {
     document.getElementById('confirmCode').focus();
 }
 
+function showCodeProblem(orderId, courierFee) {
+    const modal = document.getElementById('codeModal');
+    modal.innerHTML = `
+        <div style="background:#1a1a1a;border-radius:20px;padding:30px;width:100%;max-width:320px;text-align:center">
+            <div style="font-size:3em;margin-bottom:15px">⚠️</div>
+            <h3 style="color:#fff;margin:0 0 15px 0">Problème avec le code ?</h3>
+            <p style="color:#aaa;margin:0 0 20px 0;font-size:0.9em">Sélectionnez la raison :</p>
+            <button onclick="forceDelivery('${orderId}', ${courierFee}, 'Client absent - colis déposé')" 
+                    style="width:100%;padding:15px;margin:8px 0;background:#2196F3;color:#fff;border:none;border-radius:12px;font-size:0.95em;cursor:pointer">
+                📦 Colis déposé (client absent)
+            </button>
+            <button onclick="forceDelivery('${orderId}', ${courierFee}, 'Client a oublié le code')" 
+                    style="width:100%;padding:15px;margin:8px 0;background:#9C27B0;color:#fff;border:none;border-radius:12px;font-size:0.95em;cursor:pointer">
+                🤔 Client a oublié le code
+            </button>
+            <button onclick="forceDelivery('${orderId}', ${courierFee}, 'Remis à une autre personne')" 
+                    style="width:100%;padding:15px;margin:8px 0;background:#FF9800;color:#fff;border:none;border-radius:12px;font-size:0.95em;cursor:pointer">
+                👥 Remis à une autre personne
+            </button>
+            <button onclick="showConfirmationCode('${orderId}', ${courierFee})" 
+                    style="width:100%;padding:12px;margin-top:15px;background:#333;color:#fff;border:none;border-radius:12px;cursor:pointer">
+                ← Retour
+            </button>
+        </div>
+    `;
+}
+
+async function forceDelivery(orderId, courierFee, reason) {
+    if(!confirm('Confirmer la livraison avec cette raison ?\n\n"' + reason + '"')) return;
+    
+    await db.collection('orders').doc(orderId).update({
+        status: 'delivered',
+        deliveredAt: firebase.firestore.FieldValue.serverTimestamp(),
+        deliveryNote: reason,
+        codeBypass: true
+    });
+    
+    // Update wallet
+    const currentWallet = parseFloat(localStorage.getItem('alex_wallet') || '0');
+    const newWallet = (currentWallet + parseFloat(courierFee)).toFixed(2);
+    localStorage.setItem('alex_wallet', newWallet);
+    document.getElementById('walletAmount').innerText = newWallet + ' €';
+    
+    document.getElementById('codeModal').remove();
+    alert('✅ Livraison confirmée !\n+' + courierFee + '€');
+}
+
 async function verifyCode(orderId, courierFee) {
     const code = document.getElementById('confirmCode').value;
+    const errorDiv = document.getElementById('codeError');
+    
     if(code.length !== 4) {
-        alert('Veuillez entrer un code à 4 chiffres');
+        errorDiv.textContent = '⚠️ Entrez un code à 4 chiffres';
+        errorDiv.style.display = 'block';
         return;
     }
     
@@ -1029,9 +1085,12 @@ async function verifyCode(orderId, courierFee) {
     if(code === correctCode || !correctCode) {
         // Code correct or no code set - complete delivery
         await finishOrder(orderId, courierFee);
-        document.querySelector('[style*="position:fixed"]').remove();
+        document.getElementById('codeModal').remove();
     } else {
-        alert('Code incorrect. Veuillez réessayer.');
+        errorDiv.textContent = '❌ Code incorrect. Réessayez ou signalez un problème.';
+        errorDiv.style.display = 'block';
+        document.getElementById('confirmCode').value = '';
+        document.getElementById('confirmCode').focus();
     }
 }
 
