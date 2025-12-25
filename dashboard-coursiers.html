@@ -521,10 +521,14 @@ const VEHICLE_CAPACITY = {
 function loadAvailableOrders() {
     const ordersList = document.getElementById('orders-container'); 
     if(!ordersList) return; 
+    
+    const courierId = localStorage.getItem('alex_courier_id');
+    if(!courierId) return;
 
-    db.collection('orders')
-      .where('status', 'in', ['pending', 'pending_payment', 'paid']) 
-      .where('deliveryType', '==', 'Livraison')
+    // Listen to courier notifications for this courier
+    db.collection('courier_notifications')
+      .where('courierId', '==', courierId)
+      .where('status', '==', 'pending')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
           ordersList.innerHTML = ''; 
@@ -533,43 +537,84 @@ function loadAvailableOrders() {
               return;
           }
           snapshot.forEach(doc => {
-              const order = doc.data();
-              order.id = doc.id;
-              const orderSize = order.parcelSize || 'Petit (S)';
+              const notification = doc.data();
+              notification.notificationId = doc.id;
+              const orderSize = notification.parcelSize || 'Petit (S)';
               const allowedSizes = VEHICLE_CAPACITY[currentVehicle] || VEHICLE_CAPACITY['velo'];
               
-              // Filter logic
-              if (!allowedSizes.includes(orderSize)) return; 
-              
-              renderOrderCard(order, ordersList);
+              if (!allowedSizes.includes(orderSize)) return;
+
+              renderOrderCard(notification, ordersList);
           });
+          
+          // Play notification sound for new orders
+          if(snapshot.docChanges().some(c => c.type === 'added')) {
+              playNotificationSound();
+          }
       });
 }
 
-function renderOrderCard(order, container) {
+function playNotificationSound() {
+    try {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgA');
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+    } catch(e) {}
+}
+
+function renderOrderCard(notification, container) {
+    const courierFee = notification.courierFee || '0.00';
     const html = `
         <div class="order-card">
             <div class="order-head">
-                <span class="shop-name"><span class="emoji-anim">🏪</span> ${order.shopName}</span>
-                <span class="order-price">${order.totalPrice}€</span>
+                <span class="shop-name"><span class="emoji-anim">🏪</span> ${notification.shopName}</span>
+                <span class="order-price" style="color:#4CAF50;font-weight:bold">${courierFee}€</span>
             </div>
             <div class="big-info">
-                <div class="info-tag"><span class="emoji-anim">📦</span> Volume: <strong style="color:#fff;">${order.parcelSize || 'Petit (S)'}</strong></div>
-                <div class="info-tag"><span class="emoji-anim">📍</span> De: ${order.from}</div>
-                <div class="info-tag"><span class="emoji-anim">🏁</span> Vers: ${order.to}</div>
-                <div class="info-tag"><span class="emoji-anim">🕒</span> Pour: ${order.deliveryTime}</div>
+                <div class="info-tag"><span class="emoji-anim">📍</span> Récupérer: ${notification.shopAddress}</div>
+                <div style="text-align:center;font-size:1.5em;margin:5px 0">⬇️</div>
+                <div class="info-tag"><span class="emoji-anim">🏁</span> Livrer: ${notification.customerAddress}</div>
+                <div class="info-tag"><span class="emoji-anim">👤</span> Client: ${notification.customerName} - ${notification.customerPhone}</div>
             </div>
-            <button onclick="acceptOrder('${order.id}')" class="btn-accept">Accepter la course</button>
+            <button onclick="acceptCourierOrder('${notification.notificationId}', '${notification.orderId}')" class="btn-accept">✅ ACCEPTER LA COURSE</button>
         </div>
     `;
     container.innerHTML += html;
 }
 
-async function acceptOrder(id) {
-    await db.collection('orders').doc(id).update({status: 'accepted', courierId: localStorage.getItem('alex_courier_id')});
-    currentOrderId = id;
-    checkActiveOrder();
-    openPage('encours');
+async function acceptCourierOrder(notificationId, orderId) {
+    const courierId = localStorage.getItem('alex_courier_id');
+    
+    try {
+        // Update notification status
+        await db.collection('courier_notifications').doc(notificationId).update({
+            status: 'accepted'
+        });
+        
+        // Update order with courier info
+        await db.collection('orders').doc(orderId).update({
+            status: 'picked_up',
+            courierId: courierId,
+            courierAcceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Delete other pending notifications for this order
+        const otherNotifs = await db.collection('courier_notifications')
+            .where('orderId', '==', orderId)
+            .where('status', '==', 'pending')
+            .get();
+        
+        otherNotifs.forEach(doc => {
+            db.collection('courier_notifications').doc(doc.id).delete();
+        });
+        
+        currentOrderId = orderId;
+        checkActiveOrder();
+        openPage('encours');
+    } catch(e) {
+        console.error('Error accepting order:', e);
+        alert('Erreur lors de l\'acceptation');
+    }
 }
 
 function checkActiveOrder() {
@@ -588,33 +633,49 @@ function checkActiveOrder() {
 
 function renderActiveUI(id, data){
     const isPicked = data.status === 'picked_up';
+    const courierFee = data.courierFee || '5.00';
+    const customerPhone = data.customerPhone || data.phone || '';
+    const customerName = data.customerName || data.name || 'Client';
+    
     document.getElementById('activeOrderContent').innerHTML = `
         <div class="active-order-box">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
                 <h2 style="margin:0;color:#fff">En Cours</h2>
-                <div class="emoji-anim" style="font-size:2.5em">${currentVehicleIcon}</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="color:#4CAF50;font-weight:bold;font-size:1.2em">+${courierFee}€</span>
+                    <div class="emoji-anim" style="font-size:2.5em">${currentVehicleIcon}</div>
+                </div>
             </div>
             <div class="step-card ${!isPicked?'active':''}">
-                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">📍</span> Restaurant</div>
-                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.from}</div>
+                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">📍</span> Récupérer chez</div>
+                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.shopName || 'Commerce'}</div>
+                <div style="color:#aaa;font-size:0.85em;margin-top:5px">${data.from || data.shopAddress || ''}</div>
+                ${data.shopPhone ? `<a href="tel:${data.shopPhone}" style="display:inline-block;margin-top:8px;padding:5px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none">📞 Appeler</a>` : ''}
                 ${!isPicked ? `<button class="btn-action btn-pickup" onclick="db.collection('orders').doc('${id}').update({status:'picked_up'})">📦 Colis Récupéré</button>` : ''}
             </div>
             <div class="step-card ${isPicked?'active':''}">
-                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">🏁</span> Client</div>
-                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.to}</div>
-                ${isPicked ? `<button class="btn-action btn-deliver" onclick="finishOrder('${id}')">✅ Livré</button>` : ''}
+                <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">🏁</span> Livrer à ${customerName}</div>
+                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.to || data.customerAddress || ''}</div>
+                ${customerPhone ? `<a href="tel:${customerPhone}" style="display:inline-block;margin-top:8px;padding:5px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none">📞 Appeler Client</a>` : ''}
+                ${isPicked ? `<button class="btn-action btn-deliver" onclick="finishOrder('${id}', ${courierFee})">✅ Livré</button>` : ''}
             </div>
         </div>
     `;
 }
 
-function finishOrder(id){
-    db.collection('orders').doc(id).update({status:'delivered'});
-    const w = parseFloat(localStorage.getItem('alex_wallet')||0) + 5.00;
+async function finishOrder(id, courierFee){
+    await db.collection('orders').doc(id).update({
+        status: 'delivered',
+        deliveredAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    const fee = parseFloat(courierFee) || 5.00;
+    const w = parseFloat(localStorage.getItem('alex_wallet')||0) + fee;
     localStorage.setItem('alex_wallet', w.toFixed(2));
     document.getElementById('walletAmount').innerText = w.toFixed(2) + " €";
+    
     currentOrderId = null;
-    alert("Bravo ! Course terminée.");
+    alert(`Bravo ! Course terminée. +${fee.toFixed(2)}€`);
     closeAllPages();
 }
 
