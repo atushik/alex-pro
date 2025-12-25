@@ -528,7 +528,6 @@ function loadAvailableOrders() {
     db.collection('orders')
       .where('status', 'in', ['accepted', 'paid'])
       .where('deliveryType', '==', 'Livraison')
-      .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
           ordersList.innerHTML = ''; 
           if (snapshot.empty) {
