@@ -75,6 +75,13 @@
   .menu-item {padding:18px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; font-size:1em; color:#fff; transition:0.2s;}
   .menu-item:active {background:rgba(255,255,255,0.1);}
   .menu-item:last-child {border-bottom:none;}
+  .lang-switch {display:flex;gap:10px;width:100%}
+  .lang-btn {flex:1;padding:12px 15px;background:rgba(255,255,255,0.1);border:2px solid transparent;border-radius:12px;color:#aaa;font-weight:bold;font-size:0.95em;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .lang-btn:hover {background:rgba(255,255,255,0.15)}
+  .lang-btn.active {background:linear-gradient(135deg,var(--primary),#009624);color:#fff;border-color:var(--primary);box-shadow:0 4px 15px rgba(0,200,83,0.3)}
+  .flag-icon {font-size:1.3em;transition:transform 0.3s}
+  .lang-btn.active .flag-icon {animation:flagWave 0.5s ease-in-out}
+  @keyframes flagWave {0%,100%{transform:rotate(0deg)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
   .doc-grid {display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:10px;}
   .doc-card {background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; text-align:center; border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; color:#fff;}
   .doc-card-btn {position:absolute; top:5px; right:5px; background:rgba(255,255,255,0.2); border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;}
@@ -151,12 +158,23 @@
     <div class="page-content">
         <div class="menu-list">
              <div class="menu-item" onclick="openRadiusSettings()">
-                <span><span class="emoji-anim">🗺️</span> Type de carte (Distance)</span>
+                <span><span class="emoji-anim">🗺️</span> <span data-i18n="map_type">Type de carte (Distance)</span></span>
                 <span class="menu-arrow">❯</span>
             </div>
             <div class="menu-item">
-                <span><span class="emoji-anim">🔔</span> Notifications</span>
+                <span><span class="emoji-anim">🔔</span> <span data-i18n="notifications">Notifications</span></span>
                 <input type="checkbox" checked>
+            </div>
+            <div class="menu-item" style="flex-direction:column;align-items:flex-start;gap:10px">
+                <span><span class="emoji-anim">🌐</span> <span data-i18n="language">Langue / Language</span></span>
+                <div class="lang-switch">
+                    <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">
+                        <span class="flag-icon">🇫🇷</span> FR
+                    </button>
+                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">
+                        <span class="flag-icon">🇬🇧</span> EN
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -257,8 +275,14 @@
             <div class="doc-card">
                  <div class="doc-card-btn">👁️</div>
                 <div class="emoji-anim" style="font-size:2em">📑</div>
-                <div style="font-weight:bold;font-size:0.9em">Contrat</div>
+                <div style="font-weight:bold;font-size:0.85em">Contrat de partenariat</div>
                 <span style="background:rgba(46,125,50,0.5);color:#81c784;padding:2px 6px;border-radius:4px;font-size:0.7em">Signé</span>
+            </div>
+            <div class="doc-card" onclick="alert('Ajouter justificatif de domicile')">
+                <div class="doc-card-btn">📤</div>
+                <div class="emoji-anim" style="font-size:2em">🏠</div>
+                <div style="font-weight:bold;font-size:0.85em">Justificatif domicile</div>
+                <span style="background:rgba(239,108,0,0.5);color:#ffcc80;padding:2px 6px;border-radius:4px;font-size:0.7em">En attente</span>
             </div>
              <div class="doc-card" style="border:2px dashed #555;background:transparent" onclick="alert('Ajouter un document')">
                 <div style="font-size:2em">➕</div>
@@ -290,9 +314,60 @@
                 <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">📞</span> Appeler l'assistance</span>
                 <span class="menu-arrow">❯</span>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="openPage('faq')">
                 <span style="display:flex;align-items:center;gap:10px"><span class="emoji-anim">❓</span> FAQ</span>
                 <span class="menu-arrow">❯</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="page-faq" class="full-page">
+    <div class="bg-logos">
+        <img src="logo-pro.jpg" class="floating-logo">
+        <img src="logo-pro.jpg" class="floating-logo">
+        <img src="logo-pro.jpg" class="floating-logo">
+    </div>
+    <div class="page-header">
+        <button class="btn-back-page" onclick="openPage('aide')">‹</button>
+        <div class="page-title">FAQ</div>
+    </div>
+    <div class="page-content">
+        <div class="menu-list">
+            <div class="menu-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                <span><span class="emoji-anim">💰</span> Comment suis-je payé ?</span>
+                <span>❯</span>
+            </div>
+            <div style="display:none;padding:15px;background:rgba(0,0,0,0.3);color:#ccc;font-size:0.9em">
+                Vous êtes payé automatiquement après chaque course. Les gains s'accumulent dans votre portefeuille et vous pouvez demander un virement vers votre compte bancaire à tout moment.
+            </div>
+            <div class="menu-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                <span><span class="emoji-anim">📦</span> Comment accepter une commande ?</span>
+                <span>❯</span>
+            </div>
+            <div style="display:none;padding:15px;background:rgba(0,0,0,0.3);color:#ccc;font-size:0.9em">
+                Quand une nouvelle commande arrive, vous entendez une notification. Cliquez sur "Accepter" pour prendre la course. Naviguez vers le restaurant, récupérez la commande, puis livrez au client.
+            </div>
+            <div class="menu-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                <span><span class="emoji-anim">🔢</span> C'est quoi le code de confirmation ?</span>
+                <span>❯</span>
+            </div>
+            <div style="display:none;padding:15px;background:rgba(0,0,0,0.3);color:#ccc;font-size:0.9em">
+                Le client reçoit un code à 4 chiffres. À la livraison, demandez ce code et entrez-le dans l'app pour confirmer la livraison. Cela protège vous et le client.
+            </div>
+            <div class="menu-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                <span><span class="emoji-anim">🚗</span> Quels véhicules sont acceptés ?</span>
+                <span>❯</span>
+            </div>
+            <div style="display:none;padding:15px;background:rgba(0,0,0,0.3);color:#ccc;font-size:0.9em">
+                Tous les véhicules sont acceptés : à pied, vélo, scooter, voiture, camionnette. Les véhicules électriques sont également bienvenus !
+            </div>
+            <div class="menu-item" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">
+                <span><span class="emoji-anim">📍</span> Comment fonctionne la navigation ?</span>
+                <span>❯</span>
+            </div>
+            <div style="display:none;padding:15px;background:rgba(0,0,0,0.3);color:#ccc;font-size:0.9em">
+                Cliquez sur "Naviguer" pour ouvrir l'itinéraire dans votre application GPS préférée (Google Maps, Waze, etc.).
             </div>
         </div>
     </div>
@@ -367,12 +442,107 @@ let deliveryRadius = 15;
 let courierLat = 43.2965;
 let courierLon = 5.3698;
 let currentOrderId = null;
+let currentLang = localStorage.getItem('alex_lang') || 'fr';
+
+const TRANSLATIONS = {
+    fr: {
+        in_progress: 'En Cours',
+        pick_up: 'Récupérer chez',
+        deliver_to: 'Livrer à',
+        call: 'Appeler',
+        navigate: 'Naviguer',
+        package_picked: 'Colis Récupéré',
+        confirm_delivery: 'Confirmer Livraison',
+        available_orders: 'Commandes Disponibles',
+        no_orders: 'Aucune commande disponible',
+        accept: 'Accepter',
+        settings: 'Réglages',
+        map_type: 'Type de carte (Distance)',
+        notifications: 'Notifications',
+        language: 'Langue / Language',
+        my_account: 'Mon Compte',
+        documents: 'Mes documents',
+        my_vehicle: 'Mon véhicule',
+        logout: 'Déconnexion',
+        wallet: 'Portefeuille',
+        faq: 'FAQ',
+        online: 'En ligne',
+        offline: 'Hors ligne',
+        choose_app: 'Choisir l\'application',
+        cancel: 'Annuler',
+        confirmation_code: 'Code de confirmation',
+        ask_code: 'Demandez le code à 4 chiffres au client',
+        validate: 'Valider la livraison',
+        code_incorrect: 'Code incorrect. Veuillez réessayer.',
+        enter_code: 'Veuillez entrer un code à 4 chiffres'
+    },
+    en: {
+        in_progress: 'In Progress',
+        pick_up: 'Pick up from',
+        deliver_to: 'Deliver to',
+        call: 'Call',
+        navigate: 'Navigate',
+        package_picked: 'Package Picked Up',
+        confirm_delivery: 'Confirm Delivery',
+        available_orders: 'Available Orders',
+        no_orders: 'No orders available',
+        accept: 'Accept',
+        settings: 'Settings',
+        map_type: 'Map Type (Distance)',
+        notifications: 'Notifications',
+        language: 'Language / Langue',
+        my_account: 'My Account',
+        documents: 'My documents',
+        my_vehicle: 'My vehicle',
+        logout: 'Logout',
+        wallet: 'Wallet',
+        faq: 'FAQ',
+        online: 'Online',
+        offline: 'Offline',
+        choose_app: 'Choose app',
+        cancel: 'Cancel',
+        confirmation_code: 'Confirmation code',
+        ask_code: 'Ask the customer for the 4-digit code',
+        validate: 'Validate delivery',
+        code_incorrect: 'Incorrect code. Please try again.',
+        enter_code: 'Please enter a 4-digit code'
+    }
+};
+
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('alex_lang', lang);
+    
+    // Update button states
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    
+    // Apply translations to elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if(TRANSLATIONS[lang][key]) {
+            el.textContent = TRANSLATIONS[lang][key];
+        }
+    });
+}
+
+function t(key) {
+    return TRANSLATIONS[currentLang][key] || TRANSLATIONS['fr'][key] || key;
+}
 
 const VEHICLES = [
+    {id:'pieton', name:'À pied', icon:'🚶'},
     {id:'velo', name:'Vélo', icon:'🚲'},
+    {id:'velo_elec', name:'Vélo électrique', icon:'🔋🚲'},
     {id:'scooter', name:'Scooter', icon:'🛵'},
+    {id:'scooter_elec', name:'Scooter électrique', icon:'🔋🛵'},
     {id:'voiture', name:'Voiture', icon:'🚗'},
-    {id:'camion', name:'Camion', icon:'🚚'}
+    {id:'voiture_elec', name:'Voiture électrique', icon:'🔋🚗'},
+    {id:'camionnette', name:'Camionnette', icon:'🚐'},
+    {id:'camionnette_elec', name:'Camionnette électrique', icon:'🔋🚐'},
+    {id:'camion', name:'Camion', icon:'🚚'},
+    {id:'camion_elec', name:'Camion électrique', icon:'🔋🚚'}
 ];
 let currentVehicle = localStorage.getItem('alex_vehicle') || 'velo';
 let currentVehicleIcon = '🚲';
@@ -395,6 +565,7 @@ function initMap() {
 
     renderVehicleList();
     updateVehicleIcon();
+    setLanguage(currentLang); // Initialize language
 
     map = L.map('map-layer', {zoomControl:false}).setView([courierLat, courierLon], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -436,14 +607,19 @@ function toggleStatus() {
     isOnline = !isOnline;
     const dot = document.getElementById('statusDot');
     const txt = document.getElementById('statusText');
+    const ordersContainer = document.getElementById('orders-container');
+    
     if(isOnline) {
         dot.classList.remove('off');
         txt.innerText = "En ligne";
         document.getElementById('map-layer').style.filter = "grayscale(0%)";
+        if(ordersContainer) ordersContainer.style.display = 'flex';
+        loadAvailableOrders();
     } else {
         dot.classList.add('off');
         txt.innerText = "Hors ligne";
         document.getElementById('map-layer').style.filter = "grayscale(100%)";
+        if(ordersContainer) ordersContainer.style.display = 'none';
     }
 }
 
@@ -522,10 +698,17 @@ function previewAvatar(input) {
 
 // --- COURIER DASHBOARD LOGIC ---
 const VEHICLE_CAPACITY = {
+    'pieton': ['Petit (S)'],
     'velo': ['Petit (S)'],
+    'velo_elec': ['Petit (S)', 'Moyen (M)'],
     'scooter': ['Petit (S)', 'Moyen (M)'],
+    'scooter_elec': ['Petit (S)', 'Moyen (M)'],
     'voiture': ['Petit (S)', 'Moyen (M)', 'Grand (L)'],
-    'camion': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)']
+    'voiture_elec': ['Petit (S)', 'Moyen (M)', 'Grand (L)'],
+    'camionnette': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)'],
+    'camionnette_elec': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)'],
+    'camion': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)'],
+    'camion_elec': ['Petit (S)', 'Moyen (M)', 'Grand (L)', 'Très Grand (XL)']
 };
 
 function loadAvailableOrders() {
@@ -729,8 +912,11 @@ function checkActiveOrder() {
 function renderActiveUI(id, data){
     const isPicked = data.status === 'picked_up';
     const courierFee = data.courierFee || '5.00';
-    const customerPhone = data.customerPhone || data.phone || '';
-    const customerName = data.customerName || data.name || 'Client';
+    const customer = data.customer || {};
+    const customerPhone = customer.phone || data.customerPhone || data.phone || '';
+    const customerName = customer.name || data.customerName || 'Client';
+    const shopAddress = data.from || data.shopAddress || '';
+    const customerAddress = customer.address || data.to || data.customerAddress || '';
     
     document.getElementById('activeOrderContent').innerHTML = `
         <div class="active-order-box">
@@ -744,18 +930,105 @@ function renderActiveUI(id, data){
             <div class="step-card ${!isPicked?'active':''}">
                 <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">📍</span> Récupérer chez</div>
                 <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.shopName || 'Commerce'}</div>
-                <div style="color:#aaa;font-size:0.85em;margin-top:5px">${data.from || data.shopAddress || ''}</div>
-                ${data.shopPhone ? `<a href="tel:${data.shopPhone}" style="display:inline-block;margin-top:8px;padding:5px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none">📞 Appeler</a>` : ''}
-                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="db.collection('orders').doc('${id}').update({status:'picked_up'})">📦 Colis Récupéré</button>` : ''}
+                <div style="color:#aaa;font-size:0.85em;margin-top:5px">${shopAddress}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                    ${data.shopPhone ? `<a href="tel:${data.shopPhone}" style="display:inline-block;padding:8px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none;font-size:0.9em">📞 Appeler</a>` : ''}
+                    <button onclick="openNavigation('${shopAddress.replace(/'/g, "\\'")}')" style="padding:8px 15px;background:#FF9800;color:#fff;border:none;border-radius:20px;font-size:0.9em;cursor:pointer">🗺️ Naviguer</button>
+                </div>
+                ${!isPicked ? `<button class="btn-action btn-pickup" onclick="markPickedUp('${id}')">📦 Colis Récupéré</button>` : ''}
             </div>
             <div class="step-card ${isPicked?'active':''}">
                 <div style="font-weight:bold;margin-bottom:5px;display:flex;align-items:center;gap:5px;color:#fff"><span class="emoji-anim">🏁</span> Livrer à ${customerName}</div>
-                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${data.to || data.customerAddress || ''}</div>
-                ${customerPhone ? `<a href="tel:${customerPhone}" style="display:inline-block;margin-top:8px;padding:5px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none">📞 Appeler Client</a>` : ''}
-                ${isPicked ? `<button class="btn-action btn-deliver" onclick="finishOrder('${id}', ${courierFee})">✅ Livré</button>` : ''}
+                <div style="color:#ccc;font-size:0.9em;white-space:normal;word-break:break-word">${customerAddress}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                    ${customerPhone ? `<a href="tel:${customerPhone}" style="display:inline-block;padding:8px 15px;background:#2196F3;color:#fff;border-radius:20px;text-decoration:none;font-size:0.9em">📞 Appeler</a>` : ''}
+                    <button onclick="openNavigation('${customerAddress.replace(/'/g, "\\'")}')" style="padding:8px 15px;background:#FF9800;color:#fff;border:none;border-radius:20px;font-size:0.9em;cursor:pointer">🗺️ Naviguer</button>
+                </div>
+                ${isPicked ? `<button class="btn-action btn-deliver" onclick="showConfirmationCode('${id}', ${courierFee})">✅ Confirmer Livraison</button>` : ''}
             </div>
         </div>
     `;
+}
+
+function openNavigation(address) {
+    const encoded = encodeURIComponent(address);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = `
+        <div style="background:#1a1a1a;border-radius:20px;padding:25px;width:100%;max-width:320px;text-align:center">
+            <h3 style="color:#fff;margin:0 0 20px 0">🗺️ Choisir l'application</h3>
+            <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${encoded}','_blank');this.closest('div').parentElement.remove()" style="width:100%;padding:15px;margin:8px 0;background:#4285F4;color:#fff;border:none;border-radius:12px;font-size:1em;font-weight:bold;cursor:pointer">
+                <span style="font-size:1.2em">📍</span> Google Maps
+            </button>
+            <button onclick="window.open('https://waze.com/ul?q=${encoded}&navigate=yes','_blank');this.closest('div').parentElement.remove()" style="width:100%;padding:15px;margin:8px 0;background:#33CCFF;color:#fff;border:none;border-radius:12px;font-size:1em;font-weight:bold;cursor:pointer">
+                <span style="font-size:1.2em">🚗</span> Waze
+            </button>
+            ${isIOS ? `
+            <button onclick="window.open('maps://maps.apple.com/?daddr=${encoded}','_blank');this.closest('div').parentElement.remove()" style="width:100%;padding:15px;margin:8px 0;background:#000;color:#fff;border:none;border-radius:12px;font-size:1em;font-weight:bold;cursor:pointer">
+                <span style="font-size:1.2em">🍎</span> Plans Apple
+            </button>
+            ` : ''}
+            <button onclick="window.open('https://share.here.com/r/?m=d&destination=${encoded}','_blank');this.closest('div').parentElement.remove()" style="width:100%;padding:15px;margin:8px 0;background:#48DAD0;color:#000;border:none;border-radius:12px;font-size:1em;font-weight:bold;cursor:pointer">
+                <span style="font-size:1.2em">🌍</span> HERE WeGo
+            </button>
+            <button onclick="this.closest('div').parentElement.remove()" style="width:100%;padding:15px;margin:15px 0 0 0;background:#333;color:#fff;border:none;border-radius:12px;font-size:1em;cursor:pointer">
+                ✖️ Annuler
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function markPickedUp(orderId) {
+    db.collection('orders').doc(orderId).update({status:'picked_up'});
+}
+
+function showConfirmationCode(orderId, courierFee) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = `
+        <div style="background:#1a1a1a;border-radius:20px;padding:30px;width:100%;max-width:320px;text-align:center">
+            <div style="font-size:3em;margin-bottom:15px">🔐</div>
+            <h3 style="color:#fff;margin:0 0 10px 0">Code de confirmation</h3>
+            <p style="color:#aaa;margin:0 0 20px 0;font-size:0.9em">Demandez le code à 4 chiffres au client</p>
+            <input type="text" id="confirmCode" maxlength="4" pattern="[0-9]*" inputmode="numeric" 
+                   style="width:100%;padding:20px;font-size:2em;text-align:center;letter-spacing:15px;border:2px solid #333;border-radius:15px;background:#222;color:#fff;outline:none"
+                   placeholder="____">
+            <button onclick="verifyCode('${orderId}', ${courierFee})" 
+                    style="width:100%;padding:15px;margin:20px 0 10px 0;background:linear-gradient(135deg,#00c853,#009624);color:#fff;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer">
+                ✅ Valider la livraison
+            </button>
+            <button onclick="this.closest('div').parentElement.remove()" 
+                    style="width:100%;padding:12px;background:#333;color:#fff;border:none;border-radius:12px;cursor:pointer">
+                Annuler
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('confirmCode').focus();
+}
+
+async function verifyCode(orderId, courierFee) {
+    const code = document.getElementById('confirmCode').value;
+    if(code.length !== 4) {
+        alert('Veuillez entrer un code à 4 chiffres');
+        return;
+    }
+    
+    // Get order and verify code
+    const orderDoc = await db.collection('orders').doc(orderId).get();
+    const order = orderDoc.data();
+    const correctCode = order.confirmationCode || order.deliveryCode;
+    
+    if(code === correctCode || !correctCode) {
+        // Code correct or no code set - complete delivery
+        await finishOrder(orderId, courierFee);
+        document.querySelector('[style*="position:fixed"]').remove();
+    } else {
+        alert('Code incorrect. Veuillez réessayer.');
+    }
 }
 
 async function finishOrder(id, courierFee){
