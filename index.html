@@ -4,47 +4,41 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>AlexLivraison Pro</title>
-<link rel="manifest" href="./manifest-pro.json?v=2">
+<link rel="manifest" href="./manifest-pro.json?v=3">
 <meta name="theme-color" content="#052e16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="logo-pro.jpg?v=FINAL_SIZE">
+<link rel="apple-touch-icon" href="logo-pro.jpg">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-  :root { --primary: #00c853; --dark-green: #052e16; --light-green: #e8f5e9; }
+  :root { --primary: #00c853; --dark-green: #052e16; }
   body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #052e16 0%, #004d40 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; overflow: hidden; position: relative; }
   .bg-logos { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
   .floating-logo { position: absolute; width: 60px; height: 60px; border-radius: 50%; opacity: 0.1; animation: floatUp 15s linear infinite; object-fit: cover; }
-  .floating-logo:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
+  .floating-logo:nth-child(1) { left: 10%; animation-duration: 12s; }
   .floating-logo:nth-child(2) { left: 30%; animation-duration: 18s; animation-delay: 2s; }
   .floating-logo:nth-child(3) { left: 70%; animation-duration: 15s; animation-delay: 4s; }
   .floating-logo:nth-child(4) { left: 90%; animation-duration: 20s; animation-delay: 1s; }
   .floating-logo:nth-child(5) { left: 50%; animation-duration: 25s; animation-delay: 5s; }
   @keyframes floatUp { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
-  .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 100%; max-width: 360px; position: relative; z-index: 10; border: 1px solid rgba(255,255,255,0.2); }
-  input { width: 100%; padding: 16px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 14px; font-size: 1.2em; text-align: center; letter-spacing: 5px; box-sizing: border-box; transition: 0.3s; background: #f9f9f9; outline: none; }
-  input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(0, 200, 83, 0.1); }
-  .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, #00c853, #009624); color: #fff; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .btn-main:active { transform: scale(0.98); }
-  .btn-secondary { background: linear-gradient(135deg, #1e88e5, #1565c0); box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3); margin-top: 15px; }
-  .btn-install { background: linear-gradient(135deg, #ff6f00, #e65100); box-shadow: 0 5px 15px rgba(255, 111, 0, 0.3); margin-top: 15px; display: flex; }
-  .logo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border: 4px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 100%; max-width: 360px; position: relative; z-index: 10; }
+  input { width: 100%; padding: 16px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 14px; font-size: 1.2em; text-align: center; letter-spacing: 5px; box-sizing: border-box; background: #f9f9f9; outline: none; }
+  input:focus { border-color: var(--primary); background: #fff; }
+  .btn-main { width: 100%; padding: 16px; background: linear-gradient(135deg, #00c853, #009624); color: #fff; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 800; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
+  .btn-secondary { background: linear-gradient(135deg, #1e88e5, #1565c0); margin-top: 15px; }
+  .btn-install { background: linear-gradient(135deg, #ff6f00, #e65100); margin-top: 15px; }
+  .logo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border: 4px solid var(--primary); }
   .emoji-anim { display: inline-block; animation: stickerFloat 2s ease-in-out infinite; font-size: 1.3em; }
-  @keyframes stickerFloat { 0%,100%{transform:rotate(0deg) translateY(0);} 25%{transform:rotate(-10deg) translateY(-2px);} 75%{transform:rotate(10deg) translateY(-2px);} }
+  @keyframes stickerFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
   .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: flex-end; padding-bottom: 20px; }
-  .ios-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; text-align: center; position: relative; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-  .ios-content h3 { margin: 0 0 10px 0; color: #333; }
-  .ios-content p { color: #666; margin-bottom: 20px; line-height: 1.5; }
-  .ios-icon { width: 60px; height: 60px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-  .ios-arrow { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); font-size: 40px; color: white; animation: bounce 2s infinite; }
+  .ios-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; text-align: center; position: relative; }
   .ios-close { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #999; cursor: pointer; background: none; border: none; }
-  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-  @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-10px);} 60% {transform: translateX(-50%) translateY(-5px);} }
+  .ios-arrow { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); font-size: 40px; color: white; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%, 100% {transform: translateX(-50%) translateY(0);} 50% {transform: translateX(-50%) translateY(-10px);} }
 </style>
 </head>
 <body>
-
   <div class="bg-logos">
     <img src="logo-pro.jpg" class="floating-logo">
     <img src="logo-pro.jpg" class="floating-logo">
@@ -55,25 +49,23 @@
 
   <div id="iosInstallModal" class="ios-modal">
       <div class="ios-content">
-          <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'">×</button>
-          <img src="logo-pro.jpg" class="ios-icon" alt="Icon">
-          <h3>Installer l'app</h3>
-          <p>Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
-          <div class="ios-arrow">↓</div>
+          <button class="ios-close" onclick="document.getElementById('iosInstallModal').style.display='none'"></button>
+          <img src="logo-pro.jpg" style="width:60px;height:60px;border-radius:12px;margin-bottom:15px">
+          <h3 style="margin:0 0 10px 0;color:#333">Installer l'app</h3>
+          <p style="color:#666;line-height:1.5">Pour installer sur iPhone, appuyez sur <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Ios_share_icon.svg" style="width:18px;display:inline;vertical-align:middle"> puis <strong>Sur l'écran d'accueil</strong>.</p>
+          <div class="ios-arrow"></div>
       </div>
   </div>
 
   <div class="card">
     <img src="logo-pro.jpg" class="logo">
     <h2 style="margin:0 0 5px 0; color:#1b5e20; font-weight:900">AlexLivraison Pro</h2>
-    <p style="color:#555; margin-bottom:20px; font-weight:600"><span class="emoji-anim">⚡</span> Espace Livreurs</p>
-    
+    <p style="color:#555; margin-bottom:20px; font-weight:600"><span class="emoji-anim"></span> Espace Livreurs</p>
     <input type="password" id="pin" placeholder="Mot de passe" maxlength="8">
-    <button class="btn-main" onclick="login()"><span class="emoji-anim">🔐</span> SE CONNECTER</button>
-    <button class="btn-main btn-secondary" onclick="window.location.href='devenir-coursiers.html'"><span class="emoji-anim">📝</span> CRÉER UN COMPTE</button>
-    
-    <button id="pwaInstallBtn" class="btn-main btn-install">
-        <span class="emoji-anim">📲</span> INSTALLER APPLICATION
+    <button class="btn-main" onclick="login()"><span class="emoji-anim"></span> SE CONNECTER</button>
+    <button class="btn-main btn-secondary" onclick="window.location.href='devenir-coursiers.html'"><span class="emoji-anim"></span> CRÉER UN COMPTE</button>
+    <button id="pwaInstallBtn" class="btn-main btn-install" style="display:none">
+        <span class="emoji-anim"></span> INSTALLER APPLICATION
     </button>
   </div>
 
@@ -83,43 +75,49 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-pro.js?v=FINAL_SIZE').then(reg => {
-            reg.update();
-        }).catch(console.error);
-    });
+    navigator.serviceWorker.register('./sw-pro.js?v=3').catch(console.error);
 }
 
-let deferredPrompt;
 const installBtn = document.getElementById('pwaInstallBtn');
 const iosModal = document.getElementById('iosInstallModal');
-const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem('alex_pwa_installed');
 
-if (isInStandaloneMode) {
-    localStorage.setItem('alex_pwa_installed', 'true'); installBtn.style.display = 'none';
-} else {
+let deferredPrompt = null;
+
+// Only show install button if NOT already installed
+if (!isStandalone) {
     if (isIos) {
-        installBtn.addEventListener('click', () => {
+        // iOS - show button, open modal on click
+        installBtn.style.display = 'flex';
+        installBtn.onclick = () => { 
             iosModal.style.display = 'flex';
-        });
+            localStorage.setItem('alex_pwa_installed', 'true');
+        };
     } else {
+        // Android/Desktop - wait for beforeinstallprompt
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            installBtn.style.display = 'flex';
         });
-        installBtn.addEventListener('click', () => {
+        
+        installBtn.onclick = async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('alex_pwa_installed', 'true'); installBtn.style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("Pour installer: Options navigateur -> Ajouter à l'écran d'accueil");
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    localStorage.setItem('alex_pwa_installed', 'true');
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
             }
+        };
+        
+        // Hide after app is installed
+        window.addEventListener('appinstalled', () => {
+            localStorage.setItem('alex_pwa_installed', 'true');
+            installBtn.style.display = 'none';
         });
     }
 }
@@ -128,38 +126,35 @@ if(localStorage.getItem('alex_courier_logged')) window.location.href='dashboard-
 
 async function login() {
     const pin = document.getElementById('pin').value.trim();
-    if(!pin) return alert("Veuillez entrer votre code PIN");
+    if(!pin) return alert("Veuillez entrer votre mot de passe");
     
     const btn = document.querySelector('.btn-main');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "⌛ Vérification...";
+    btn.innerHTML = " Vérification...";
     
     try {
         const snap = await db.collection('couriers').where('password', '==', pin).get();
         if(!snap.empty) {
             const doc = snap.docs[0];
             const data = doc.data();
-            
             if(data.status === 'pending') {
-                alert("Votre compte est en attente de validation par l'administrateur.");
+                alert("Votre compte est en attente de validation.");
                 btn.innerHTML = originalText;
                 return;
             }
-            
             localStorage.setItem('alex_courier_logged', 'true');
             localStorage.setItem('alex_courier_id', doc.id);
             localStorage.setItem('alex_courier_name', data.fullName);
             window.location.href = 'dashboard-coursiers.html';
         } else {
-            alert("Code PIN incorrect ou compte introuvable.");
+            alert("Mot de passe incorrect.");
             btn.innerHTML = originalText;
         }
-    } catch(e) { 
-        alert("Erreur de connexion. Vérifiez internet.");
+    } catch(e) {
+        alert("Erreur de connexion.");
         btn.innerHTML = originalText;
     }
 }
 </script>
 </body>
-</html> 
-
+</html>

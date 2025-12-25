@@ -762,13 +762,17 @@ function playNotificationSound() {
     try {
         // Vibrate on mobile
         if ('vibrate' in navigator) {
-            navigator.vibrate([200, 100, 200, 100, 200]);
+            navigator.vibrate([300, 100, 300]);
         }
         
-        // Play sound
-        const audio = new Audio('https://cdn.pixabay.com/audio/2024/02/19/audio_e4043113bc.mp3'); // Loud alert 3 sec
-        audio.volume = 1.0; audio.loop = false;
-        audio.play().catch(() => {});
+        // Play short notification sound (2 sec)
+        const audio = new Audio('https://www.soundjay.com/buttons/beep-07a.mp3');
+        audio.volume = 1.0;
+        
+        // Stop after 2 seconds
+        audio.play().then(() => {
+            setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 2000);
+        }).catch(() => {});
         
         // Show browser notification
         showPushNotification('🛵 Nouvelle Course!', 'Une nouvelle livraison est disponible');
