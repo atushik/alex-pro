@@ -523,12 +523,11 @@ function loadAvailableOrders() {
     if(!ordersList) return; 
     
     const courierId = localStorage.getItem('alex_courier_id');
-    if(!courierId) return;
 
-    // Listen to courier notifications for this courier
-    db.collection('courier_notifications')
-      .where('courierId', '==', courierId)
-      .where('status', '==', 'pending')
+    // Listen to orders that are accepted and need delivery (no assigned courier yet)
+    db.collection('orders')
+      .where('status', 'in', ['accepted', 'paid'])
+      .where('deliveryType', '==', 'Livraison')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
           ordersList.innerHTML = ''; 
@@ -536,21 +535,34 @@ function loadAvailableOrders() {
               ordersList.innerHTML = '<div class="empty-state"><span class="emoji-anim" style="font-size:2em">📡</span><br>Aucune commande disponible.</div>';
               return;
           }
+          
+          let hasOrders = false;
           snapshot.forEach(doc => {
-              const notification = doc.data();
-              notification.notificationId = doc.id;
-              const orderSize = notification.parcelSize || 'Petit (S)';
+              const order = doc.data();
+              // Skip orders already taken by another courier
+              if(order.courierId && order.courierId !== courierId) return;
+              
+              order.id = doc.id;
+              const orderSize = order.parcelSize || 'Petit (S)';
               const allowedSizes = VEHICLE_CAPACITY[currentVehicle] || VEHICLE_CAPACITY['velo'];
               
               if (!allowedSizes.includes(orderSize)) return;
 
-              renderOrderCard(notification, ordersList);
+              hasOrders = true;
+              renderOrderCard(order, ordersList);
           });
+          
+          if(!hasOrders) {
+              ordersList.innerHTML = '<div class="empty-state"><span class="emoji-anim" style="font-size:2em">📡</span><br>Aucune commande disponible.</div>';
+          }
           
           // Play notification sound for new orders
           if(snapshot.docChanges().some(c => c.type === 'added')) {
               playNotificationSound();
           }
+      }, error => {
+          console.error('Error loading orders:', error);
+          ordersList.innerHTML = '<div class="empty-state"><span class="emoji-anim" style="font-size:2em">⚠️</span><br>Erreur de chargement</div>';
       });
 }
 
@@ -562,50 +574,42 @@ function playNotificationSound() {
     } catch(e) {}
 }
 
-function renderOrderCard(notification, container) {
-    const courierFee = notification.courierFee || '0.00';
+function renderOrderCard(order, container) {
+    const courierFee = order.courierFee || ((parseFloat(order.platformFee || 0) * 0.5).toFixed(2)) || '2.00';
+    const customer = order.customer || {};
+    const shopAddress = order.shopAddress || order.from || '';
+    const customerAddress = customer.address || order.to || '';
+    const customerName = customer.name || '';
+    const customerPhone = customer.phone || '';
+    
     const html = `
         <div class="order-card">
             <div class="order-head">
-                <span class="shop-name"><span class="emoji-anim">🏪</span> ${notification.shopName}</span>
-                <span class="order-price" style="color:#4CAF50;font-weight:bold">${courierFee}€</span>
+                <span class="shop-name"><span class="emoji-anim">🏪</span> ${order.shopName || 'Commerce'}</span>
+                <span class="order-price" style="color:#4CAF50;font-weight:bold">+${courierFee}€</span>
             </div>
             <div class="big-info">
-                <div class="info-tag"><span class="emoji-anim">📍</span> Récupérer: ${notification.shopAddress}</div>
+                <div class="info-tag"><span class="emoji-anim">📍</span> Récupérer: ${shopAddress}</div>
                 <div style="text-align:center;font-size:1.5em;margin:5px 0">⬇️</div>
-                <div class="info-tag"><span class="emoji-anim">🏁</span> Livrer: ${notification.customerAddress}</div>
-                <div class="info-tag"><span class="emoji-anim">👤</span> Client: ${notification.customerName} - ${notification.customerPhone}</div>
+                <div class="info-tag"><span class="emoji-anim">🏁</span> Livrer: ${customerAddress}</div>
+                <div class="info-tag"><span class="emoji-anim">👤</span> Client: ${customerName} - ${customerPhone}</div>
             </div>
-            <button onclick="acceptCourierOrder('${notification.notificationId}', '${notification.orderId}')" class="btn-accept">✅ ACCEPTER LA COURSE</button>
+            <button onclick="acceptOrder('${order.id}')" class="btn-accept">✅ ACCEPTER LA COURSE</button>
         </div>
     `;
     container.innerHTML += html;
 }
 
-async function acceptCourierOrder(notificationId, orderId) {
+async function acceptOrder(orderId) {
     const courierId = localStorage.getItem('alex_courier_id');
+    const courierName = localStorage.getItem('alex_courier_name') || '';
     
     try {
-        // Update notification status
-        await db.collection('courier_notifications').doc(notificationId).update({
-            status: 'accepted'
-        });
-        
-        // Update order with courier info
         await db.collection('orders').doc(orderId).update({
             status: 'picked_up',
             courierId: courierId,
+            courierName: courierName,
             courierAcceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        // Delete other pending notifications for this order
-        const otherNotifs = await db.collection('courier_notifications')
-            .where('orderId', '==', orderId)
-            .where('status', '==', 'pending')
-            .get();
-        
-        otherNotifs.forEach(doc => {
-            db.collection('courier_notifications').doc(doc.id).delete();
         });
         
         currentOrderId = orderId;
@@ -613,10 +617,8 @@ async function acceptCourierOrder(notificationId, orderId) {
         openPage('encours');
     } catch(e) {
         console.error('Error accepting order:', e);
-        alert('Erreur lors de l\'acceptation');
+        alert('Erreur: ' + e.message);
     }
-}
-
 function checkActiveOrder() {
     const uid = localStorage.getItem('alex_courier_id');
     db.collection('orders').where('courierId', '==', uid).where('status', 'in', ['accepted', 'picked_up']).onSnapshot(snap => {
